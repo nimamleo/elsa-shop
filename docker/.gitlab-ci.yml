@@ -1,0 +1,7 @@
+build:
+  script:
+    - 'echo build'
+
+deploy:
+  script:
+    - 'echo deploy'
