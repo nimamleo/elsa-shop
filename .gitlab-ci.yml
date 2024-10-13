@@ -5,9 +5,9 @@ stages:
 dev-build-job:
   stage: dev
   before_script:
-    - 'echo "CI_REGISTRY_USER: $CI_REGISTRY_USER"'
-    - 'echo "$CI_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD"'
-    - 'echo "$CI_REGISTRY_: $CI_REGISTRY_"'
+    - 'echo "CI_REGISTRY_USER: ${CI_REGISTRY_USER:-not set}"'
+    - 'echo "CI_REGISTRY_PASSWORD: ${CI_REGISTRY_PASSWORD:-not set}"'
+    - 'echo "CI_REGISTRY: ${CI_REGISTRY:-not set}"'
   script:
     - 'echo build'
 
