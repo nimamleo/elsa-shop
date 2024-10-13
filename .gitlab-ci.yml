@@ -1,14 +1,13 @@
 stages:
   - dev
-  - release
-  - prod
 
-build:
+
+dev-build-job:
   stage: dev
   script:
     - 'echo build'
 
-deploy:
+dev-deploy-job:
   stage: dev
   script:
     - 'echo deploy'
