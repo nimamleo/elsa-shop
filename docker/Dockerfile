@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install --verbose
+RUN npm install
 
 RUN npm run build
 
@@ -16,6 +16,6 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json .
 
-RUN npm install --verbose --production
+RUN npm install
 
 CMD ["node" , "dist/main.js"]
