@@ -24,7 +24,7 @@ dev-build-job:
 
 dev-deploy-job:
   stage: dev-deploy
-#  image: docker:24
+  image: docker:24
 #  services:
 #    - docker:24-dind
 #  variables:
