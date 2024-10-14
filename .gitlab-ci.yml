@@ -6,16 +6,17 @@ stages:
 
 dev-build-job:
   stage: dev-build
-  image: docker:24-dind
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs"
+  image: docker:24
   before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID -f ./docker/Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
+    - docker build -t "$CI_REGISTRY_IMAGE:$CI_PIPELINE_ID" -f ./docker/Dockerfile .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_PIPELINE_ID"
+  only:
+    - develop
   after_script:
     - docker logout $CI_REGISTRY
+
 
 
 
