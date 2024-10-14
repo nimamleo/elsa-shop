@@ -6,7 +6,7 @@ services:
       - web
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend1.rule=Host(`dev-api.elsa-gallery.shop`)"
+      - "traefik.http.routers.backend1.rule=Host(`stage.elsa-gallery.shop`)"
       - "traefik.http.routers.backend1.entrypoints=websecure"
       - "traefik.http.routers.backend1.tls.certresolver=myresolver"
       - "traefik.http.services.backend1.loadbalancer.server.port=80"
