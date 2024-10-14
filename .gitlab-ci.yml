@@ -21,6 +21,7 @@ dev-build-job:
 
 
 
+
 dev-deploy-job:
   stage: dev-deploy
   image: docker:24
@@ -37,3 +38,5 @@ dev-deploy-job:
     - docker compose up -d
   after_script:
     - docker logout $CI_REGISTRY
+  tags:
+    - tech
