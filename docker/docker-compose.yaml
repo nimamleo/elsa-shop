@@ -6,11 +6,12 @@ services:
       proxy:
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=web"
-      - "traefik.http.routers.charter-stage.rule=Host(`dev-api.elsa-gallery.shop`)"
-      - "traefik.http.routers.charter-stage.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.charter-stage.entrypoints=https"
-      - "traefik.http.services.charter-stage.loadbalancer.server.port=3010"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.shop-dev-api.tls=true"
+      - "traefik.http.routers.shop-dev-api.entrypoints=websecure"
+      - "traefik.http.routers.shop-dev-api.rule=Host(`dev-api.elsa-gallery.shop`)"
+      - "traefik.http.routers.shop-dev-api.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.shop-dev-api.loadbalancer.server.port=3010"
 
 
 
