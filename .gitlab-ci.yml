@@ -16,6 +16,6 @@ dev-build-job:
     - docker logout $CI_REGISTRY
 
 dev-deploy-job:
-  stage: dev
+  stage: dev-deploy
   script:
     - echo "deploy"
