@@ -13,9 +13,8 @@ dev-build-job:
     - 'echo $CI_REGISTRY'
     - 'echo $CI_PIPELINE_ID'
     - 'echo $CI_REGISTRY_IMAGE'
-    -  unset DOCKER_HOST
+    - unset DOCKER_HOST
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-#    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 
   script:
     - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID -f ./docker/Dockerfile .
