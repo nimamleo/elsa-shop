@@ -23,5 +23,12 @@ dev-build-job:
 
 dev-deploy-job:
   stage: dev-deploy
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
-    - echo "deploy"
+    - cd docker
+    - docker compose pull
+    - docker compose down
+    - docker compose up -d
+  after_script:
+    - docker logout $CI_REGISTRY

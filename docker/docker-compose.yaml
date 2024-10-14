@@ -3,11 +3,11 @@ services:
   shop-backend:
     image: registry.gitlab.com/tech7684941/shop:${CI_PIPELINE_ID}
     networks:
-      back-traefik:
+      proxy:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
-      - "traefik.http.routers.charter-stage.rule=Host(`charter-api.go2tr.work`)"
+      - "traefik.http.routers.charter-stage.rule=Host(`dev-api.elsa-gallery.shop`)"
       - "traefik.http.routers.charter-stage.tls.certresolver=letsencrypt"
       - "traefik.http.routers.charter-stage.entrypoints=https"
       - "traefik.http.services.charter-stage.loadbalancer.server.port=3010"
@@ -15,5 +15,5 @@ services:
 
 
 networks:
-  back-traefik:
+  proxy:
     external: true
