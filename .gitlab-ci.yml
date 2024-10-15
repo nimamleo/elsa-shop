@@ -20,8 +20,10 @@ dev-build-job:
   before_script:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
+    - echo $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID-$PREBUILD
     - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID-$PREBUILD -f ./docker/prebuild.dockerfile .
     - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID-$PREBUILD
+    - echo $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID-API
     - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID-API -f ./docker/api-gateway.dockerfile .
     - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID-API
   after_script:
