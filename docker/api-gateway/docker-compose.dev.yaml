@@ -4,6 +4,8 @@ services:
     image: registry.gitlab.com/tech7684941/shop:${CI_PIPELINE_ID}
     networks:
       - web
+    env_file:
+      - ./.env
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend1.rule=Host(`stage.elsa-gallery.shop`)"
