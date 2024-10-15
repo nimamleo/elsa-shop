@@ -4,8 +4,6 @@ stages:
   - release
   - prod
 
-variables:
-  API: "api"
 
 dev-build-job:
   stage: api-dev-build
@@ -24,7 +22,7 @@ dev-build-job:
     - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
     - echo $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
     - docker build --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID -f ./docker/api-gateway.dockerfile .
-    - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID-API
+    - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
   after_script:
     - docker logout $CI_REGISTRY
 
