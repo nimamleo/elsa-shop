@@ -1,5 +1,5 @@
-FROM registry.gitlab.com/tech7684941/shop:${CI_PIPELINE_ID} as prebuild
 ARG CI_PIPELINE_ID
+FROM registry.gitlab.com/tech7684941/shop:${CI_PIPELINE_ID} as prebuild
 
 
 FROM node:18.6.0-alpine as release
