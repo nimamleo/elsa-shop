@@ -23,7 +23,7 @@ dev-build-job:
     - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID -f ./docker/prebuild.dockerfile .
     - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
     - echo $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID -f ./docker/api-gateway.dockerfile .
+    - docker build --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID -f ./docker/api-gateway.dockerfile .
     - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID-API
   after_script:
     - docker logout $CI_REGISTRY
