@@ -1,7 +1,7 @@
 version: "3"
 services:
   shop-backend:
-    image: registry.gitlab.com/tech7684941/shop:${CI_PIPELINE_ID}
+    image: registry.gitlab.com/tech7684941/shop-api:${CI_PIPELINE_ID}
     networks:
       - web
     labels:

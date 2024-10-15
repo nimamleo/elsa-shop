@@ -1,11 +1,11 @@
 stages:
-  - dev-build
-  - dev-deploy
+  - api-dev-build
+  - api-dev-deploy
   - release
   - prod
 
 dev-build-job:
-  stage: dev-build
+  stage: api-dev-build
   image: docker:24
   only:
     - develop
@@ -16,16 +16,16 @@ dev-build-job:
   before_script:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
-    - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID -f ./docker/Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
+    - docker build -t $CI_REGISTRY_IMAGE-prebuild:$CI_PIPELINE_ID -f ./docker/prebuild.dockerfile .
+    - docker push $CI_REGISTRY_IMAGE-prebuild:$CI_PIPELINE_ID
+    - docker build -t $CI_REGISTRY_IMAGE-api:$CI_PIPELINE_ID -f ./docker/api-gateway.dockerfile .
+    - docker push $CI_REGISTRY_IMAGE-api:$CI_PIPELINE_ID
   after_script:
     - docker logout $CI_REGISTRY
 
 
-
-
 dev-deploy-job:
-  stage: dev-deploy
+  stage: api-dev-deploy
   image: docker:24
   only:
     - develop
@@ -33,9 +33,9 @@ dev-deploy-job:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
     - cd docker
-    - docker compose pull
-    - docker compose down
-    - docker compose up -d
+    - docker compose -f docker/api-gateway/docker-compose.dev.yaml pull
+    - docker compose -f docker/api-gateway/docker-compose.dev.yaml down
+    - docker compose -f docker/api-gateway/docker-compose.dev.yaml up -d
   after_script:
     - docker logout $CI_REGISTRY
   tags:
