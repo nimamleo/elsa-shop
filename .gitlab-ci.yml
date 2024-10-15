@@ -35,10 +35,10 @@ dev-deploy-job:
   before_script:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
-    - cd docker
-    - docker compose -f /api-gateway/docker-compose.dev.yaml pull
-    - docker compose -f /api-gateway/docker-compose.dev.yaml down
-    - docker compose -f /api-gateway/docker-compose.dev.yaml up -d
+    - cd docker/api-gateway
+    - docker compose -f docker-compose.dev.yaml pull
+    - docker compose -f docker-compose.dev.yaml down
+    - docker compose -f docker-compose.dev.yaml up -d
   after_script:
     - docker logout $CI_REGISTRY
   tags:
