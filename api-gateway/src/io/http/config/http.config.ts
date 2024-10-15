@@ -1,14 +1,14 @@
 import { ConfigFactory, registerAs } from '@nestjs/config';
 import * as process from 'node:process';
 
-export interface IAppConfig {
+export interface IHttpConfig {
   port: number;
 }
 
-export const APP_CONFIG = 'app-config';
+export const HTTP_CONFIG_TOKEN = 'http-config-token';
 
-export const appConfig = registerAs<IAppConfig, ConfigFactory<IAppConfig>>(
-  APP_CONFIG,
+export const httpConfig = registerAs<IHttpConfig, ConfigFactory<IHttpConfig>>(
+  HTTP_CONFIG_TOKEN,
   () => {
     if (!process.env.HTTP_PORT) {
       throw new Error('HTTP_PORT not provided');

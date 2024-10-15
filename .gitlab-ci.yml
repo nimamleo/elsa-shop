@@ -7,6 +7,8 @@ stages:
 dev-build-job:
   stage: dev-build
   image: docker:24
+  only:
+    - develop
   services:
     - docker:24-dind
   variables:
@@ -25,6 +27,8 @@ dev-build-job:
 dev-deploy-job:
   stage: dev-deploy
   image: docker:24
+  only:
+    - develop
   before_script:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
