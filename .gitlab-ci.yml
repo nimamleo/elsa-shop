@@ -36,6 +36,7 @@ dev-deploy-job:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
     - cd docker/api-gateway
+    - echo "$SHOP_ENV" > .env
     - docker compose -f docker-compose.dev.yaml pull
     - docker compose -f docker-compose.dev.yaml down
     - docker compose -f docker-compose.dev.yaml up -d
