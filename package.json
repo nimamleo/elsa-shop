@@ -4,7 +4,9 @@
   "description": "",
   "author": "",
   "private": true,
-  "workspaces": ["api-gateway"],
+  "workspaces": [
+    "api-gateway"
+  ],
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "npm run prebuild --workspaces --if-present",

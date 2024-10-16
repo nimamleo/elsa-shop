@@ -4,6 +4,7 @@ services:
     image: registry.gitlab.com/tech7684941/shop:${CI_PIPELINE_ID}
     networks:
       - web
+      - db
     env_file:
       - ./.env
     labels:
@@ -17,6 +18,10 @@ services:
       - "traefik.http.routers.backend1-http.middlewares=backend1-https-redirect"
       - "traefik.http.middlewares.backend1-https-redirect.redirectscheme.scheme=https"
 
+
+
 networks:
   web:
+    external: true
+  db:
     external: true
