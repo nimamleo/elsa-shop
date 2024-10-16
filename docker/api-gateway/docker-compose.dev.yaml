@@ -4,7 +4,7 @@ services:
     image: registry.gitlab.com/tech7684941/shop:${CI_PIPELINE_ID}
     networks:
       - web
-      - db
+      - db-back
     env_file:
       - ./.env
     labels:
@@ -23,5 +23,5 @@ services:
 networks:
   web:
     external: true
-  db:
+  db-back:
     external: true
