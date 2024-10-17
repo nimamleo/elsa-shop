@@ -25,15 +25,16 @@
       "es2021"
     ],
     "paths": {
-      "@common/*": ["../common/*"],
-      "@infrastructure/*": ["../infrastructure/src/*"],
-      "@user/*": ["../user/src/*"],
-      "@auth/*": ["../auth/src/*"]
+      "@common/*": [
+        "../common/*"
+      ],
+      "@infrastructure/*": [
+        "../infrastructure/src/*"
+      ]
     }
   },
   "include": [
-    "src/**/*",
-    "../infrastructure/**/migrations/**/*.ts",
+    "src",
   ],
   "exclude": [
     "node_modules",
