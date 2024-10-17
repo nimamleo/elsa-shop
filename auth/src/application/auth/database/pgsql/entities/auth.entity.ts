@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { IAuth, IAuthEntity } from '../../../models/auth.model';
 
 @Entity('auth')
@@ -12,10 +18,10 @@ export class AuthEntity {
   @Column({ type: 'text' })
   refreshToken: string;
 
-  @Column({ type: 'timestamp' })
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @Column({ type: 'timestamp' })
+  @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
   static fromIAuth(iAuth: IAuth): AuthEntity {
