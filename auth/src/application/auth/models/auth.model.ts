@@ -3,6 +3,7 @@ import { IDated } from '@common/interfaces/dated.interface';
 
 export interface IAuth {
   userId: string;
+  accessToken?: string;
   refreshToken: string;
 }
 

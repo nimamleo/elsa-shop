@@ -29,27 +29,30 @@ export class AuthHttpController extends AbstractHttpController {
   @ApiResponse({ type: LoginResponse })
   @ApiBody({ type: LoginRequest })
   async login(@Res() response: Response, @Body() body: LoginRequest) {
-    const createUser = await this.userService.loginUser(body.phone);
-    if (createUser.isError()) {
-      this.sendResult(response, createUser);
-      return;
+    let user = await this.userService.getUserByPhone(body.phone);
+    if (user.isError()) {
+      user = await this.userService.createUser({
+        phone: body.phone,
+      });
+      if (user.isError()) {
+        this.sendResult(response, user);
+        return;
+      }
     }
 
-    const assignToken = await this.authService.generateTokens(
-      createUser.value.id,
-    );
-    if (assignToken.isError()) {
-      this.sendResult(response, assignToken);
+    const createNewAuth = await this.authService.verifyAuth(user.value.id);
+    if (createNewAuth.isError()) {
+      this.sendResult(response, createNewAuth);
       return;
     }
 
     this.sendResult(
       response,
       Ok<LoginResponse>({
-        id: createUser.value.id,
-        phone: createUser.value.phone,
-        accessToken: assignToken.value.accessToken,
-        refreshToken: assignToken.value.refreshToken,
+        id: user.value.id,
+        phone: user.value.phone,
+        accessToken: createNewAuth.value.accessToken,
+        refreshToken: createNewAuth.value.refreshToken,
       }),
     );
   }

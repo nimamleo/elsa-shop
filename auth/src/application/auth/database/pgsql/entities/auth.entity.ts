@@ -12,7 +12,7 @@ export class AuthEntity {
   @PrimaryGeneratedColumn('increment', { type: 'bigint', unsigned: true })
   id: number;
 
-  @Column({ type: 'bigint', unsigned: true })
+  @Column({ type: 'bigint', unsigned: true, unique: true })
   userId: number;
 
   @Column({ type: 'text' })

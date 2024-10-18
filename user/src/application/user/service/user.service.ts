@@ -5,7 +5,7 @@ import {
 } from '../database/providers/user.provider';
 import { HandleError } from '@common/decorators/handle-error.decorator';
 import { Err, Ok, Result } from '@common/result';
-import { IUserEntity } from '../models/user.model';
+import { IUser, IUserEntity } from '../models/user.model';
 
 @Injectable()
 export class UserService {
@@ -14,17 +14,21 @@ export class UserService {
     private readonly userProvider: IUserProvider,
   ) {}
 
-  @HandleError
-  async loginUser(phone: string): Promise<Result<IUserEntity>> {
+  async getUserByPhone(phone: string): Promise<Result<IUserEntity>> {
     const getUser = await this.userProvider.getUserByPhone(phone);
     if (getUser.isError()) {
-      const createUser = await this.userProvider.createUser({ phone: phone });
-      if (createUser.isError()) {
-        return Err(createUser.err);
-      }
-      return Ok(createUser.value);
+      return Err(getUser.err);
     }
-
     return Ok(getUser.value);
+  }
+
+  async createUser(iUser: IUser): Promise<Result<IUserEntity>> {
+    const createUser = await this.userProvider.createUser({
+      phone: iUser.phone,
+    });
+    if (createUser.isError()) {
+      return Err(createUser.err);
+    }
+    return Ok(createUser.value);
   }
 }
