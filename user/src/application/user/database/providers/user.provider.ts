@@ -3,6 +3,8 @@ import { IUser, IUserEntity } from '../../models/user.model';
 
 export interface IUserReader {
   getUserByPhone(phone: string): Promise<Result<IUserEntity>>;
+
+  getUserById(id: string): Promise<Result<IUserEntity>>;
 }
 
 export interface IUserWriter {

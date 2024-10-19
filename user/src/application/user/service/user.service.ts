@@ -31,4 +31,13 @@ export class UserService {
     }
     return Ok(createUser.value);
   }
+
+  @HandleError
+  async getUserById(id: string): Promise<Result<IUserEntity>> {
+    const res = await this.userProvider.getUserById(id);
+    if (res.isError()) {
+      return Err(res.err);
+    }
+    return Ok(res.value);
+  }
 }

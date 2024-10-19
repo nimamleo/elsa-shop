@@ -38,4 +38,17 @@ export class UserPgsqlService implements IUserProvider {
 
     return Ok(UserEntity.toIUserEntity(res));
   }
+
+  @HandleError
+  async getUserById(id: string): Promise<Result<IUserEntity>> {
+    const res = await this.userRepository
+      .createQueryBuilder('u')
+      .where('u.id = :id', { id: id })
+      .getOne();
+    if (!res) {
+      return Err('user not found', GenericStatusCodes.NOT_FOUND);
+    }
+
+    return Ok(UserEntity.toIUserEntity(res));
+  }
 }

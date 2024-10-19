@@ -31,6 +31,7 @@ async function main() {
     .setTitle('SHOP API Gateway')
     .setDescription('SHOP API Gateway')
     .setVersion('1.0')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', in: 'header' })
     .build();
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig, {
     deepScanRoutes: true,

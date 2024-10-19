@@ -8,6 +8,7 @@ import { Err, Ok, Result } from '@common/result';
 import { GenerateTokensDto } from './dto/generate-tokens.dto';
 import { JwtService } from '@nestjs/jwt';
 import { IAuthEntity } from '../models/auth.model';
+import { IAuthJwt } from '@common/interfaces/auth-jwt.interface';
 
 @Injectable()
 export class AuthService {
@@ -69,5 +70,10 @@ export class AuthService {
       accessToken: accessToken,
       refreshToken: refreshToken,
     });
+  }
+
+  @HandleError
+  async extractUserId(token: string): Promise<Result<string>> {
+    return Ok(this.jwtService.verify<IAuthJwt>(token).id);
   }
 }

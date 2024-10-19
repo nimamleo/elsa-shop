@@ -1,18 +1,21 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Res,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AbstractHttpController } from '@common/http/abstract-http.controller';
 import { Ok } from '@common/result';
 import { UserService } from '@user/application/user/service/user.service';
 import { LoginRequest, LoginResponse } from './model/login.model';
 import { AuthService } from '@auth/application/auth/services/auth.service';
+import { AuthGuard } from './guard/auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -56,4 +59,9 @@ export class AuthHttpController extends AbstractHttpController {
       }),
     );
   }
+
+  @Get()
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  async test(@Res() response: Response) {}
 }
