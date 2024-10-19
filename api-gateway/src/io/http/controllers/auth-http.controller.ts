@@ -16,6 +16,7 @@ import { UserService } from '@user/application/user/service/user.service';
 import { LoginRequest, LoginResponse } from './model/login.model';
 import { AuthService } from '@auth/application/auth/services/auth.service';
 import { AuthGuard } from './guard/auth.guard';
+import { GetUserId } from './decorators/get-user-id.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -63,5 +64,7 @@ export class AuthHttpController extends AbstractHttpController {
   @Get()
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  async test(@Res() response: Response) {}
+  async test(@Res() response: Response, @GetUserId() userId: string) {
+    this.sendResult(response, Ok(userId));
+  }
 }

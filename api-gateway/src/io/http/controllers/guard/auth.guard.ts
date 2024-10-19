@@ -8,6 +8,7 @@ import { UserService } from '@user/application/user/service/user.service';
 import { Request } from 'express';
 import { GenericStatusCodes } from '@common/enums/status.enum';
 import { AuthService } from '@auth/application/auth/services/auth.service';
+import { HandleError } from '@common/decorators/handle-error.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -15,6 +16,7 @@ export class AuthGuard implements CanActivate {
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
+  @HandleError
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
@@ -27,12 +29,12 @@ export class AuthGuard implements CanActivate {
       return false;
     }
 
-    const userId = await this.authService.extractUserId(bearerToken[1]);
-    if (!userId) {
+    const getUserIdRes = await this.authService.extractUserId(bearerToken[1]);
+    if (getUserIdRes.isError()) {
       return false;
     }
 
-    const userExist = await this.userService.getUserById(userId.value);
+    const userExist = await this.userService.getUserById(getUserIdRes.value);
     if (userExist.isError()) {
       if (userExist.err._code == GenericStatusCodes.NOT_FOUND) {
         throw UnauthorizedException;
@@ -40,7 +42,7 @@ export class AuthGuard implements CanActivate {
       return false;
     }
 
-    request['userId'] = userId;
+    request['userId'] = getUserIdRes.value;
 
     return true;
   }

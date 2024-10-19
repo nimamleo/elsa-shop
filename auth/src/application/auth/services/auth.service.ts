@@ -74,6 +74,10 @@ export class AuthService {
 
   @HandleError
   async extractUserId(token: string): Promise<Result<string>> {
-    return Ok(this.jwtService.verify<IAuthJwt>(token).id);
+    const verifyRes = this.jwtService.verify<IAuthJwt>(token);
+    if (!verifyRes) {
+      return Err('some thing went wrong');
+    }
+    return Ok(verifyRes.id);
   }
 }
