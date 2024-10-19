@@ -17,8 +17,8 @@ services:
       - "traefik.http.routers.backend1-http.entrypoints=web"
       - "traefik.http.routers.backend1-http.middlewares=backend1-https-redirect"
       - "traefik.http.middlewares.backend1-https-redirect.redirectscheme.scheme=https"
-
-
+    ports:
+      - 3010:3010
 
 networks:
   web:
