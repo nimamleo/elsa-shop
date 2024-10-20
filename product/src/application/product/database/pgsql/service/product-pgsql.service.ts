@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from '../entities/product.entity';
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { ICategory } from '../../../models/category.model';
+import { ICategory, ICategoryEntity } from '../../../models/category.model';
 import { CategoryEntity } from '../entities/category.entity';
 
 @Injectable()
@@ -31,7 +31,7 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
   }
 
   @HandleError
-  async CreateCategory(iCategory: ICategory): Promise<Result<ICategory>> {
+  async CreateCategory(iCategory: ICategory): Promise<Result<ICategoryEntity>> {
     const res = await this.categoryRepository.save(
       CategoryEntity.fromICategory(iCategory),
     );
@@ -40,5 +40,11 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
     }
 
     return Ok(CategoryEntity.toICategoryEntity(res));
+  }
+
+  @HandleError
+  async getCategoryList(): Promise<Result<ICategoryEntity[]>> {
+    const res = await this.categoryRepository.createQueryBuilder().getMany();
+    return Ok(res.map((x) => CategoryEntity.toICategoryEntity(x)));
   }
 }

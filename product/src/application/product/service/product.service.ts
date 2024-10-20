@@ -6,7 +6,7 @@ import {
 import { HandleError } from '@common/decorators/handle-error.decorator';
 import { IProduct, IProductEntity } from '../models/product.model';
 import { Err, Ok, Result } from '@common/result';
-import { ICategory } from '../models/category.model';
+import { ICategory, ICategoryEntity } from '../models/category.model';
 
 @Injectable()
 export class ProductService {
@@ -26,8 +26,18 @@ export class ProductService {
   }
 
   @HandleError
-  async CreateCategory(iCategory: ICategory): Promise<Result<ICategory>> {
+  async CreateCategory(iCategory: ICategory): Promise<Result<ICategoryEntity>> {
     const res = await this.productDatabaseProvider.CreateCategory(iCategory);
+    if (res.isError()) {
+      return Err(res.err);
+    }
+
+    return Ok(res.value);
+  }
+
+  @HandleError
+  async getCategoryList(): Promise<Result<ICategoryEntity[]>> {
+    const res = await this.productDatabaseProvider.getCategoryList();
     if (res.isError()) {
       return Err(res.err);
     }
