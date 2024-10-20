@@ -1,3 +1,3 @@
 export enum Quality {
-  COTTON = 1,
+  COTTON = 'cotton',
 }

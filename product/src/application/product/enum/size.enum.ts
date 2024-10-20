@@ -1,3 +1,3 @@
 export enum Size {
-  SMALL = 1,
+  SMALL = 's',
 }

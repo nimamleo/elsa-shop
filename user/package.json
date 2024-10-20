@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "migration": "npx typeorm migration:generate -d ./ormconfig",
+    "migration": "npm run build && npx typeorm migration:generate -d ./ormconfig",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\""
   },
   "dependencies": {

@@ -19,7 +19,7 @@ export class CategoryEntity {
   @Column({ type: 'enum', enum: Quality })
   title: string;
 
-  @Column({ type: 'enum', enum: Quality })
+  @Column({ type: 'varchar' })
   slug: CategorySlug;
 
   @OneToMany(() => ProductEntity, (x) => x.category)

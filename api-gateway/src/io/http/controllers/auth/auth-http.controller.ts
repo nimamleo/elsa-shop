@@ -15,8 +15,8 @@ import { Ok } from '@common/result';
 import { UserService } from '@user/application/user/service/user.service';
 import { LoginRequest, LoginResponse } from './model/login.model';
 import { AuthService } from '@auth/application/auth/services/auth.service';
-import { AuthGuard } from './guard/auth.guard';
-import { GetUserId } from './decorators/get-user-id.decorator';
+import { AuthGuard } from '../../guard/auth.guard';
+import { GetUserId } from '../../decorators/get-user-id.decorator';
 
 @ApiTags('auth')
 @Controller('auth')

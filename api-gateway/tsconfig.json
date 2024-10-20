@@ -28,6 +28,7 @@
       "@common/*": ["../common/*"],
       "@infrastructure/*": ["../infrastructure/src/*"],
       "@user/*": ["../user/src/*"],
+      "@product/*": ["../product/src/*"],
       "@auth/*": ["../auth/src/*"]
     }
   },

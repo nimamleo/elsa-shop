@@ -28,10 +28,10 @@ export class ProductEntity {
   @Column({ type: 'int' })
   price: number;
 
-  @Column({ type: 'enum', enum: Quality })
+  @Column({ type: 'varchar' })
   quality: Quality;
 
-  @Column({ type: 'enum', enum: Country })
+  @Column({ type: 'varchar' })
   country: Country;
 
   @CreateDateColumn({ type: 'bigint', unsigned: true })

@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { IUser, IUserEntity } from '../../../models/user.model';
+import { Role } from '../../../enum/role.enum';
 
 @Entity('user')
 export class UserEntity {
@@ -24,6 +25,9 @@ export class UserEntity {
   @Column({ type: 'text', nullable: true })
   address: string;
 
+  @Column({ type: 'varchar' })
+  role: Role;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
@@ -36,10 +40,13 @@ export class UserEntity {
     }
 
     const user = new UserEntity();
+
     user.firstName = iUser.firstName;
     user.lastName = iUser.lastName;
     user.phone = iUser.phone;
     user.address = iUser.address;
+    user.role = iUser.role;
+
     return user;
   }
 
@@ -54,6 +61,7 @@ export class UserEntity {
       lastName: userEntity.lastName,
       phone: userEntity.phone,
       address: userEntity.address,
+      role: userEntity.role,
       createdAt: userEntity.createdAt,
       updatedAt: userEntity.updatedAt,
     };

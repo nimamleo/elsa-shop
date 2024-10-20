@@ -19,7 +19,7 @@ export class InfoEntity {
   @Column({ type: 'varchar', length: 255 })
   color: string;
 
-  @Column({ type: 'enum', enum: Size })
+  @Column({ type: 'varchar' })
   size: Size;
 
   @Column({ type: 'int' })

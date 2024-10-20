@@ -1,3 +1,3 @@
 export enum Country {
-  IRAN = 1,
+  IRAN = 'iran',
 }
