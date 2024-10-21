@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Res,
   UseGuards,
@@ -8,19 +9,27 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AbstractHttpController } from '@common/http/abstract-http.controller';
-import { CreateProductRequest } from './model/create-product.model';
+import {
+  CreateProductRequest,
+  CreateProductResponse,
+} from './model/create-product.model';
 import { ProductService } from '@product/application/product/service/product.service';
 import { AuthGuard } from '../../guard/auth.guard';
 import { RBACGuard } from '../../guard/rbac.guard';
 import { RBAC } from '../../decorators/rbac.decorator';
 import { Role } from '@user/application/user/enum/role.enum';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Ok } from '@common/result';
 import { Response } from 'express';
-import { CreateCategoryRequest } from './model/create-category.model';
+import {
+  CreateCategoryRequest,
+  CreateCategoryResponse,
+} from './model/create-category.model';
+import { GetCategoryListResponse } from './model/get-category-list.model';
 
 @Controller('dashboard')
 @UseGuards(AuthGuard, RBACGuard)
+@UsePipes(ValidationPipe)
 @ApiTags('dashboard')
 @ApiBearerAuth()
 export class DashboardHttpController extends AbstractHttpController {
@@ -30,6 +39,8 @@ export class DashboardHttpController extends AbstractHttpController {
 
   @Post('product')
   @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiResponse({ type: CreateProductResponse })
+  @ApiBody({ type: CreateProductRequest })
   async createProduct(
     @Res() response: Response,
     @Body() body: CreateProductRequest,
@@ -43,25 +54,70 @@ export class DashboardHttpController extends AbstractHttpController {
       category: { id: body.categoryId },
       info: [],
     });
-    this.sendResult(response, Ok(true));
+    if (res.isError()) {
+      this.sendResult(response, res);
+      return;
+    }
+
+    this.sendResult(
+      response,
+      Ok<CreateProductResponse>({
+        id: res.value.id,
+        title: res.value.title,
+        description: res.value.description,
+        price: res.value.price,
+        country: res.value.country,
+        quality: res.value.quality,
+        category: { id: res.value.category.id },
+        createdAt: res.value.createdAt.toISOString(),
+      }),
+    );
   }
 
   @Post('category')
   @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
-  @UsePipes(ValidationPipe)
+  @ApiResponse({ type: CreateCategoryResponse })
+  @ApiBody({ type: CreateCategoryRequest })
   async createCategory(
     @Res() response: Response,
     @Body() body: CreateCategoryRequest,
   ) {
     const res = await this.productService.CreateCategory({
       title: body.title,
-      slug: body.slug,
       products: [],
     });
     if (res.isError()) {
       this.sendResult(response, res);
       return;
     }
-    this.sendResult(response, Ok(true));
+
+    this.sendResult(
+      response,
+      Ok<CreateCategoryResponse>({
+        id: res.value.id,
+        title: res.value.title,
+        createdAt: res.value.createdAt.toISOString(),
+      }),
+    );
+  }
+
+  @Get('category')
+  async getCategoryList(@Res() response: Response) {
+    const res = await this.productService.getCategoryList();
+    if (res.isError()) {
+      this.sendResult(response, res);
+      return;
+    }
+
+    this.sendResult(
+      response,
+      Ok<GetCategoryListResponse>({
+        list: res.value.map((x) => ({
+          id: x.id,
+          title: x.title,
+          createdAt: x.createdAt.toISOString(),
+        })),
+      }),
+    );
   }
 }

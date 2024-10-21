@@ -6,8 +6,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { CategorySlug } from '../../../enum/category-slug.enum';
-import { Quality } from '../../../enum/quality.enum';
 import { ProductEntity } from './product.entity';
 import { ICategory, ICategoryEntity } from '../../../models/category.model';
 
@@ -16,11 +14,8 @@ export class CategoryEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   id: number;
 
-  @Column({ type: 'enum', enum: Quality })
-  title: string;
-
   @Column({ type: 'varchar' })
-  slug: CategorySlug;
+  title: string;
 
   @OneToMany(() => ProductEntity, (x) => x.category)
   products: ProductEntity[];
@@ -39,7 +34,6 @@ export class CategoryEntity {
     const category = new CategoryEntity();
 
     category.title = iCategory.title;
-    category.slug = iCategory.slug;
 
     return category;
   }
@@ -51,7 +45,6 @@ export class CategoryEntity {
     return {
       id: category.id.toString(),
       title: category.title,
-      slug: category.slug,
       products:
         category.products && category.products.length > 0
           ? category.products.map((x) => ProductEntity.toIProductEntity(x))
