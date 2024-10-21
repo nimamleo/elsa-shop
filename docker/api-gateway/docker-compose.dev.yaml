@@ -13,14 +13,12 @@ services:
       - "traefik.http.routers.backend1.entrypoints=websecure"
       - "traefik.http.routers.backend1.tls.certresolver=myresolver"
       - "traefik.http.services.backend1.loadbalancer.server.port=3010"
-      - "traefik.http.services.sv-socket.loadbalancer.server.port=8080"
       - "traefik.http.routers.backend1-http.rule=Host(`stage.elsa-gallery.shop`)"
       - "traefik.http.routers.backend1-http.entrypoints=web"
       - "traefik.http.routers.backend1-http.middlewares=backend1-https-redirect"
       - "traefik.http.middlewares.backend1-https-redirect.redirectscheme.scheme=https"
     ports:
-      - 3010:3010
-      - 8080:8080
+      - "3010:3010"
 
 networks:
   web:
