@@ -23,23 +23,26 @@ export class CommentPgsqlService implements ICommentDatabaseProvider {
   ): Promise<Result<ICommentEntity[]>> {
     const query = this.commentRepository
       .createQueryBuilder('c')
-      .leftJoinAndSelect('c.like', 'l')
-      .addSelect((subQuery: SelectQueryBuilder<any>) => {
-        return subQuery
-          .select('count(l.id)', 'likeCount')
-          .from(LikeEntity, 'like')
-          .where('like.commentId = c.id');
-      });
+      .leftJoinAndSelect('c.likes', 'l')
+      .select('c.targetId', 'targetId')
+      .addSelect('ROUND(AVG(c.score) ,1)', 'averageScore')
+      .addSelect('COUNT(l.id)', 'likeCount')
+      .groupBy('c.targetId');
 
+    console.log(await query.getRawMany());
     if (queryable.orderBy) {
       switch (queryable.orderBy) {
         case CommentOrderBy.LIKE: {
-          query.orderBy('likeCount', queryable.orderType);
+          query.orderBy('"likeCount"', queryable.orderType);
+          break;
         }
         case CommentOrderBy.SCORE: {
+          query.orderBy('"averageScore"', queryable.orderType);
+          break;
         }
       }
     }
+    console.log(await query.getRawMany());
     return;
   }
 }

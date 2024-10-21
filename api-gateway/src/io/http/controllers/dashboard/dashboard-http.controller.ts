@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Res,
   UseGuards,
   UsePipes,
@@ -26,6 +27,9 @@ import {
   CreateCategoryResponse,
 } from './model/create-category.model';
 import { GetCategoryListResponse } from './model/get-category-list.model';
+import { CommentService } from '@comment/application/comment/service/comment.service';
+import { CommentOrderBy } from '@comment/application/comment/database/enum/comment-order-by.enum';
+import { GetProductQuery } from './model/get-product.model';
 
 @Controller('dashboard')
 @UseGuards(AuthGuard, RBACGuard)
@@ -33,7 +37,10 @@ import { GetCategoryListResponse } from './model/get-category-list.model';
 @ApiTags('dashboard')
 @ApiBearerAuth()
 export class DashboardHttpController extends AbstractHttpController {
-  constructor(private readonly productService: ProductService) {
+  constructor(
+    private readonly productService: ProductService,
+    private readonly commentService: CommentService,
+  ) {
     super();
   }
 
@@ -72,6 +79,17 @@ export class DashboardHttpController extends AbstractHttpController {
         createdAt: res.value.createdAt.toISOString(),
       }),
     );
+  }
+
+  @Get('products')
+  async getProductList(
+    @Res() response: Response,
+    @Query() query: GetProductQuery,
+  ) {
+    this.commentService.getComments({
+      orderType: 'ASC',
+      orderBy: CommentOrderBy.LIKE,
+    });
   }
 
   @Post('category')

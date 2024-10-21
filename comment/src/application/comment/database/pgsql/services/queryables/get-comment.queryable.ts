@@ -1,7 +1,7 @@
 import { CommentOrderBy } from '../../../enum/comment-order-by.enum';
-import { OrderType } from '@common/type/order.type';
+import { Order } from '@common/type/order';
 
 export class GetCommentQueryable {
   orderBy: CommentOrderBy;
-  orderType: OrderType;
+  orderType: Order;
 }

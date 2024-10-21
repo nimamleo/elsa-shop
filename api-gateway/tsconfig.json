@@ -29,6 +29,7 @@
       "@infrastructure/*": ["../infrastructure/src/*"],
       "@user/*": ["../user/src/*"],
       "@product/*": ["../product/src/*"],
+      "@comment/*": ["../comment/src/*"],
       "@auth/*": ["../auth/src/*"]
     }
   },
