@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.backend1-http.middlewares=backend1-https-redirect"
       - "traefik.http.middlewares.backend1-https-redirect.redirectscheme.scheme=https"
     ports:
-      - 80:3010
+      - 8080:3010
 
 networks:
   web:
