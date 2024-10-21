@@ -4,6 +4,8 @@ import { ICategory, ICategoryEntity } from '../../models/category.model';
 
 export interface IProductReader {
   getCategoryList(): Promise<Result<ICategoryEntity[]>>;
+
+  getProductList(): Promise<Result<IProductEntity[]>>;
 }
 export interface IProductWriter {
   createProduct(iProduct: IProduct): Promise<Result<IProductEntity>>;

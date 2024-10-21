@@ -8,6 +8,7 @@ import {
   httpConfig,
   IHttpConfig,
 } from './io/http/config/http.config';
+import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes';
 
 async function loadConfig(): Promise<ConfigService> {
   const app = await NestFactory.createApplicationContext(
@@ -27,6 +28,8 @@ async function main() {
   const appConfig: IHttpConfig = configService.get(HTTP_CONFIG_TOKEN);
   const logger = new Logger('AppModule');
 
+  const theme = new SwaggerTheme();
+  const darkStyle = theme.getBuffer(SwaggerThemeNameEnum.DARK);
   const swaggerConfig = new DocumentBuilder()
     .setTitle('SHOP API Gateway')
     .setDescription('SHOP API Gateway')
@@ -41,6 +44,7 @@ async function main() {
     swaggerOptions: {
       persistAuthorization: true,
     },
+    customCss: darkStyle,
   });
 
   await app.init();

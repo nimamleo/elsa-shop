@@ -28,8 +28,12 @@ import {
 } from './model/create-category.model';
 import { GetCategoryListResponse } from './model/get-category-list.model';
 import { CommentService } from '@comment/application/comment/service/comment.service';
+import {
+  GetProduct,
+  GetProductQuery,
+  GetProductResponse,
+} from './model/get-product-list.model';
 import { CommentOrderBy } from '@comment/application/comment/database/enum/comment-order-by.enum';
-import { GetProductQuery } from './model/get-product.model';
 
 @Controller('dashboard')
 @UseGuards(AuthGuard, RBACGuard)
@@ -86,10 +90,65 @@ export class DashboardHttpController extends AbstractHttpController {
     @Res() response: Response,
     @Query() query: GetProductQuery,
   ) {
-    this.commentService.getComments({
-      orderType: 'ASC',
-      orderBy: CommentOrderBy.LIKE,
-    });
+    const productListRes = await this.productService.getProductList();
+    if (productListRes.isError()) {
+      this.sendResult(response, productListRes);
+      return;
+    }
+    switch (query.orderBy) {
+      case CommentOrderBy.LIKE: {
+        const commentListRes = await this.commentService.getComments({
+          orderType: query.orderType,
+          orderBy: query.orderBy,
+        });
+        if (commentListRes.isError()) {
+          this.sendResult(response, commentListRes);
+          return;
+        }
+
+        const result: GetProduct[] = [];
+        commentListRes.value.map((x) => {
+          const product = productListRes.value.find(
+            (product) => x == product.id,
+          );
+          if (product) {
+            result.push({
+              id: product.id,
+              title: product.title,
+              description: product.description,
+              price: product.price,
+              country: product.country,
+              quality: product.quality,
+              createdAt: product.createdAt.toISOString(),
+              category: { id: product.category.id },
+            });
+          }
+        });
+
+        this.sendResult(
+          response,
+          Ok<GetProductResponse>({
+            list: result,
+          }),
+        );
+      }
+    }
+
+    this.sendResult(
+      response,
+      Ok<GetProductResponse>({
+        list: productListRes.value.map((x) => ({
+          id: x.id,
+          title: x.title,
+          description: x.description,
+          price: x.price,
+          country: x.country,
+          quality: x.quality,
+          createdAt: x.createdAt.toISOString(),
+          category: { id: x.category.id },
+        })),
+      }),
+    );
   }
 
   @Post('category')

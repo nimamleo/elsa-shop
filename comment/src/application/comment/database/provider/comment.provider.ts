@@ -3,9 +3,7 @@ import { Result } from '@common/result';
 import { GetCommentQueryable } from '../pgsql/services/queryables/get-comment.queryable';
 
 export interface ICommentReader {
-  getComments(
-    queryable: GetCommentQueryable,
-  ): Promise<Result<ICommentEntity[]>>;
+  getComments(queryable: GetCommentQueryable): Promise<Result<string[]>>;
 }
 
 export interface ICommentWriter {}

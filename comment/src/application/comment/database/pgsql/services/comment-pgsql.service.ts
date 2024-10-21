@@ -1,7 +1,7 @@
 import { ICommentDatabaseProvider } from '../../provider/comment.provider';
 import { Injectable } from '@nestjs/common';
 import { GetCommentQueryable } from './queryables/get-comment.queryable';
-import { Result } from '@common/result';
+import { Ok, Result } from '@common/result';
 import { ICommentEntity } from '../../../models/comment.model';
 import { HandleError } from '@common/decorators/handle-error.decorator';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,9 +18,14 @@ export class CommentPgsqlService implements ICommentDatabaseProvider {
   ) {}
 
   @HandleError
-  async getComments(
-    queryable: GetCommentQueryable,
-  ): Promise<Result<ICommentEntity[]>> {
+  async getComments(queryable: GetCommentQueryable): Promise<Result<string[]>> {
+    if (!queryable.orderBy) {
+      queryable.orderBy = CommentOrderBy.LIKE;
+    }
+    if (!queryable.orderType) {
+      queryable.orderType = 'DESC';
+    }
+
     const query = this.commentRepository
       .createQueryBuilder('c')
       .leftJoinAndSelect('c.likes', 'l')
@@ -29,20 +34,18 @@ export class CommentPgsqlService implements ICommentDatabaseProvider {
       .addSelect('COUNT(l.id)', 'likeCount')
       .groupBy('c.targetId');
 
-    console.log(await query.getRawMany());
-    if (queryable.orderBy) {
-      switch (queryable.orderBy) {
-        case CommentOrderBy.LIKE: {
-          query.orderBy('"likeCount"', queryable.orderType);
-          break;
-        }
-        case CommentOrderBy.SCORE: {
-          query.orderBy('"averageScore"', queryable.orderType);
-          break;
-        }
+    switch (queryable.orderBy) {
+      case CommentOrderBy.LIKE: {
+        query.orderBy('"likeCount"', queryable.orderType);
+        break;
+      }
+      case CommentOrderBy.SCORE: {
+        query.orderBy('"averageScore"', queryable.orderType);
+        break;
       }
     }
-    console.log(await query.getRawMany());
-    return;
+
+    const res = await query.getRawMany();
+    return Ok(res.map((x) => x.targetId));
   }
 }

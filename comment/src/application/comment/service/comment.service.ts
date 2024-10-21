@@ -5,7 +5,7 @@ import {
 } from '../database/provider/comment.provider';
 import { HandleError } from '@common/decorators/handle-error.decorator';
 import { GetCommentQueryable } from '../database/pgsql/services/queryables/get-comment.queryable';
-import { Result } from '@common/result';
+import { Err, Ok, Result } from '@common/result';
 import { ICommentEntity } from '../models/comment.model';
 
 @Injectable()
@@ -16,10 +16,12 @@ export class CommentService {
   ) {}
 
   @HandleError
-  async getComments(
-    queryable: GetCommentQueryable,
-  ): Promise<Result<ICommentEntity[]>> {
+  async getComments(queryable: GetCommentQueryable): Promise<Result<string[]>> {
     const res = await this.commentDatabaseProvider.getComments(queryable);
-    return;
+    if (res.isError()) {
+      return Err(res.err);
+    }
+
+    return Ok(res.value);
   }
 }

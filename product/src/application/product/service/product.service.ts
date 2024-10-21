@@ -44,4 +44,14 @@ export class ProductService {
 
     return Ok(res.value);
   }
+
+  @HandleError
+  async getProductList(): Promise<Result<IProductEntity[]>> {
+    const res = await this.productDatabaseProvider.getProductList();
+    if (res.isError()) {
+      return Err(res.err);
+    }
+
+    return Ok(res.value);
+  }
 }

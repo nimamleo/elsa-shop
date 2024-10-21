@@ -47,4 +47,10 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
     const res = await this.categoryRepository.createQueryBuilder().getMany();
     return Ok(res.map((x) => CategoryEntity.toICategoryEntity(x)));
   }
+
+  @HandleError
+  async getProductList(): Promise<Result<IProductEntity[]>> {
+    const res = await this.productRepository.createQueryBuilder().getMany();
+    return Ok(res.map((x) => ProductEntity.toIProductEntity(x)));
+  }
 }
