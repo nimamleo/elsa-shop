@@ -17,12 +17,13 @@ export class ProductService {
 
   @HandleError
   async createProduct(iProduct: IProduct): Promise<Result<IProductEntity>> {
-    const res = await this.productDatabaseProvider.createProduct(iProduct);
-    if (res.isError()) {
-      return Err(res.err);
+    const createProduct =
+      await this.productDatabaseProvider.createProduct(iProduct);
+    if (createProduct.isError()) {
+      return Err(createProduct.err);
     }
 
-    return Ok(res.value);
+    return Ok(createProduct.value);
   }
 
   @HandleError

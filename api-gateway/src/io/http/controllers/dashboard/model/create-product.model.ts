@@ -1,6 +1,7 @@
 import { Quality } from '@product/application/product/enum/quality.enum';
 import { Country } from '@product/application/product/enum/country.enum';
 import {
+  IsArray,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -9,6 +10,24 @@ import {
 } from 'class-validator';
 import { ICategoryEntity } from '@product/application/product/models/category.model';
 import { ApiProperty } from '@nestjs/swagger';
+import { Size } from '@product/application/product/enum/size.enum';
+
+export class CreateProductInfo {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  color: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsEnum(Size)
+  size: Size;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  count: number;
+}
 
 export class CreateProductRequest {
   @ApiProperty()
@@ -40,6 +59,10 @@ export class CreateProductRequest {
   @IsNotEmpty()
   @IsNumberString()
   categoryId: string;
+
+  @ApiProperty({ type: [CreateProductInfo] })
+  @IsArray({ each: true })
+  info: CreateProductInfo[];
 }
 
 export class CategoryResponse {

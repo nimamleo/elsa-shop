@@ -63,7 +63,11 @@ export class DashboardHttpController extends AbstractHttpController {
       country: body.country,
       quality: body.quality,
       category: { id: body.categoryId },
-      info: [],
+      info: body.info.map((x) => ({
+        color: x.color,
+        size: x.size,
+        count: x.count,
+      })),
     });
     if (res.isError()) {
       this.sendResult(response, res);
