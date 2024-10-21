@@ -10,15 +10,13 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend1.rule=Host(`stage.elsa-gallery.shop`)"
-      - "traefik.http.routers.backend1.entrypoints=websecure"
-      - "traefik.http.routers.backend1.tls.certresolver=myresolver"
+      - "traefik.http.routers.backend1.entrypoints=web,websecure"  # Allow both HTTP and HTTPS
+      - "traefik.http.routers.backend1.tls=true"  # Enable TLS
       - "traefik.http.services.backend1.loadbalancer.server.port=3010"
-      - "traefik.http.routers.backend1-http.rule=Host(`stage.elsa-gallery.shop`)"
-      - "traefik.http.routers.backend1-http.entrypoints=web"
-      - "traefik.http.routers.backend1-http.middlewares=backend1-https-redirect"
       - "traefik.http.middlewares.backend1-https-redirect.redirectscheme.scheme=https"
-    ports:
-      - 8080:3010
+      - "traefik.http.middlewares.backend1-https-redirect.redirectscheme.permanent=true"
+      - "traefik.http.routers.backend1.middlewares=backend1-https-redirect"
+    # Remove the ports section as Traefik will handle the routing
 
 networks:
   web:
