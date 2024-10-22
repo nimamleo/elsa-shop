@@ -11,3 +11,5 @@ COPY --from=prebuild /app/package*.json ./
 RUN npm install
 
 CMD ["node" , "api-gateway/dist/api-gateway/src/main"]
+
+EXPOSE 3010
