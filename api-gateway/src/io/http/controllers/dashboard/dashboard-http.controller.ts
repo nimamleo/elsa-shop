@@ -34,6 +34,7 @@ import {
   GetProductResponse,
 } from './model/get-product-list.model';
 import { CommentOrderBy } from '@comment/application/comment/database/enum/comment-order-by.enum';
+import { Pagination } from '@common/pagination/pagination.model';
 
 @Controller('dashboard')
 @UseGuards(AuthGuard, RBACGuard)
@@ -99,6 +100,7 @@ export class DashboardHttpController extends AbstractHttpController {
     @Res() response: Response,
     @Query() query: GetProductQuery,
   ) {
+    const pagination = new Pagination(1);
     const productListRes = await this.productService.getProductList();
     if (productListRes.isError()) {
       this.sendResult(response, productListRes);

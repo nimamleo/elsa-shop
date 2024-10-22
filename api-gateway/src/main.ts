@@ -29,7 +29,7 @@ async function main() {
   const logger = new Logger('AppModule');
 
   const theme = new SwaggerTheme();
-  const darkStyle = theme.getBuffer(SwaggerThemeNameEnum.DARK);
+  const darkStyle = theme.getBuffer(SwaggerThemeNameEnum.ONE_DARK);
   const swaggerConfig = new DocumentBuilder()
     .setTitle('SHOP API Gateway')
     .setDescription('SHOP API Gateway')
