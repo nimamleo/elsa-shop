@@ -10,6 +10,17 @@ export class CategoryResponse {
   id: string;
 }
 
+export class CreateProductInfoResponse {
+  @ApiProperty()
+  size: string;
+
+  @ApiProperty()
+  color: string;
+
+  @ApiProperty()
+  count: number;
+}
+
 export class GetProduct {
   @ApiProperty()
   id: string;
@@ -28,6 +39,9 @@ export class GetProduct {
 
   @ApiProperty()
   country: string;
+
+  @ApiProperty({ type: [CreateProductInfoResponse] })
+  info: CreateProductInfoResponse[];
 
   @ApiProperty()
   category: CategoryResponse;

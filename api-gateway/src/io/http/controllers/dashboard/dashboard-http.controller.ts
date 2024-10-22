@@ -84,6 +84,11 @@ export class DashboardHttpController extends AbstractHttpController {
         country: res.value.country,
         quality: res.value.quality,
         category: { id: res.value.category.id },
+        info: res.value.info.map((x) => ({
+          size: x.size,
+          color: x.color,
+          count: x.count,
+        })),
         createdAt: res.value.createdAt.toISOString(),
       }),
     );
@@ -123,6 +128,11 @@ export class DashboardHttpController extends AbstractHttpController {
               price: product.price,
               country: product.country,
               quality: product.quality,
+              info: product.info.map((x) => ({
+                size: x.size,
+                color: x.color,
+                count: x.count,
+              })),
               createdAt: product.createdAt.toISOString(),
               category: { id: product.category.id },
             });
@@ -148,6 +158,11 @@ export class DashboardHttpController extends AbstractHttpController {
           price: x.price,
           country: x.country,
           quality: x.quality,
+          info: x.info.map((i) => ({
+            size: i.size,
+            color: i.color,
+            count: i.count,
+          })),
           createdAt: x.createdAt.toISOString(),
           category: { id: x.category.id },
         })),

@@ -8,7 +8,7 @@ import { DataSource, EntityManager, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { ICategory, ICategoryEntity } from '../../../models/category.model';
 import { CategoryEntity } from '../entities/category.entity';
-import { Product1729446557373 } from '@infrastructure/infrastructure/database/pgsql/migrations/product/1729446557373-product';
+import { Product1729446557373 } from '@infrastructure/infrastructure/database/pgsql/migrations/product/1729446557373-product.migration';
 import { InfoEntity } from '../entities/info.entity';
 
 @Injectable()
@@ -32,7 +32,7 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
           .getRepository(ProductEntity)
           .save(ProductEntity.fromIProduct(iProduct));
 
-        product.info.map((x) =>
+        product.info = iProduct.info.map((x) =>
           InfoEntity.fromIInfo({
             product: { id: product.id.toString() },
             count: x.count,
@@ -41,11 +41,7 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
           }),
         );
 
-        const info = await entityManager
-          .getRepository(InfoEntity)
-          .save(product.info);
-
-        product.info = info;
+        await entityManager.getRepository(InfoEntity).save(product.info);
 
         return product;
       },
@@ -74,7 +70,10 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
 
   @HandleError
   async getProductList(): Promise<Result<IProductEntity[]>> {
-    const res = await this.productRepository.createQueryBuilder().getMany();
+    const res = await this.productRepository
+      .createQueryBuilder('p')
+      .leftJoinAndSelect('p.info', 'i')
+      .getMany();
     return Ok(res.map((x) => ProductEntity.toIProductEntity(x)));
   }
 }

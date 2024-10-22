@@ -70,6 +70,17 @@ export class CategoryResponse {
   id: string;
 }
 
+export class CreateProductInfoResponse {
+  @ApiProperty()
+  size: string;
+
+  @ApiProperty()
+  color: string;
+
+  @ApiProperty()
+  count: number;
+}
+
 export class CreateProductResponse {
   @ApiProperty()
   id: string;
@@ -94,4 +105,7 @@ export class CreateProductResponse {
 
   @ApiProperty()
   createdAt: string;
+
+  @ApiProperty({ type: [CreateProductInfoResponse] })
+  info: CreateProductInfoResponse[];
 }
