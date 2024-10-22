@@ -61,7 +61,7 @@ export class CreateProductRequest {
   categoryId: string;
 
   @ApiProperty({ type: [CreateProductInfo] })
-  @IsArray({ each: true })
+  @IsArray()
   info: CreateProductInfo[];
 }
 
