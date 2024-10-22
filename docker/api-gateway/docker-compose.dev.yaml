@@ -13,13 +13,6 @@ services:
       - "traefik.http.routers.shop-backend.entrypoints=websecure"
       - "traefik.http.routers.shop-backend.tls.certresolver=myresolver"
       - "traefik.http.services.shop-backend.loadbalancer.server.port=3010"
-      # Add timeouts
-      - "traefik.http.middlewares.shop-backend-timeout.forwardauth.authResponseHeaders=60"
-      - "traefik.http.services.shop-backend.loadbalancer.passHostHeader=true"
-      - "traefik.http.middlewares.shop-backend-retry.retry.attempts=3"
-      - "traefik.http.middlewares.shop-backend-retry.retry.initialInterval=100ms"
-      # Apply middlewares
-      - "traefik.http.routers.shop-backend.middlewares=shop-backend-timeout,shop-backend-retry"
 
 networks:
   web:
