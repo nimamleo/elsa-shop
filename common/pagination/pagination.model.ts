@@ -1,17 +1,31 @@
 export class Pagination {
-  skip: number = 1;
-  limit: number = 15;
+  private readonly page: number = 1;
+  private readonly pageSize: number = 15;
 
-  constructor(page: number, pageSize?: number) {
-    if (
-      typeof page == "number" &&
-      page > 0 &&
-      typeof pageSize == "number" &&
-      pageSize > 0 &&
-      pageSize <= 100
-    ) {
-      this.limit = pageSize;
-      this.skip = (page - 1) * pageSize;
+  constructor(page: any, pageSize?: any) {
+    const pageNum = Number(page);
+    if (!isNaN(pageNum) && pageNum > 0) {
+      this.page = pageNum;
     }
+    const pageSizeNum = Number(pageSize);
+    if (!isNaN(pageSizeNum) && pageSizeNum > 1 && pageSizeNum <= 100) {
+      this.pageSize = pageSizeNum;
+    }
+  }
+
+  getPage(): number {
+    return this.page;
+  }
+
+  getPageSize(): number {
+    return this.pageSize;
+  }
+
+  getLimit(): number {
+    return this.pageSize;
+  }
+
+  getSkip(): number {
+    return (this.page - 1) * this.pageSize;
   }
 }

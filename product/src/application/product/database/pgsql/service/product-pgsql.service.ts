@@ -10,6 +10,7 @@ import { ICategory, ICategoryEntity } from '../../../models/category.model';
 import { CategoryEntity } from '../entities/category.entity';
 import { Product1729446557373 } from '@infrastructure/infrastructure/database/pgsql/migrations/product/1729446557373-product.migration';
 import { InfoEntity } from '../entities/info.entity';
+import { GetProductList } from './dto/get-product-list.dto';
 
 @Injectable()
 export class ProductPgsqlService implements IProductDatabaseProvider {
@@ -69,11 +70,16 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
   }
 
   @HandleError
-  async getProductList(): Promise<Result<IProductEntity[]>> {
-    const res = await this.productRepository
+  async getProductList(
+    queryable: GetProductList,
+  ): Promise<Result<[IProductEntity[], number]>> {
+    const [res, count] = await this.productRepository
       .createQueryBuilder('p')
       .leftJoinAndSelect('p.info', 'i')
-      .getMany();
-    return Ok(res.map((x) => ProductEntity.toIProductEntity(x)));
+      .skip(queryable.limitation.skip)
+      .limit(queryable.limitation.limit)
+      .getManyAndCount();
+
+    return Ok([res.map((x) => ProductEntity.toIProductEntity(x)), count]);
   }
 }

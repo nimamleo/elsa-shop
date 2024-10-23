@@ -21,7 +21,7 @@ export class CreateProductInfoResponse {
   count: number;
 }
 
-export class GetProduct {
+export class GetProductResponse {
   @ApiProperty()
   id: string;
 
@@ -48,9 +48,6 @@ export class GetProduct {
 
   @ApiProperty()
   createdAt: string;
-}
-export class GetProductResponse {
-  list: GetProduct[];
 }
 
 export class GetProductQuery {

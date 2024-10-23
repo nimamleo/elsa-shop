@@ -58,12 +58,12 @@ export class AuthService {
   async generateTokens(userId: string): Promise<Result<GenerateTokensDto>> {
     const accessToken = this.jwtService.sign(
       { id: userId },
-      { expiresIn: '30m' },
+      { expiresIn: '1d' },
     );
 
     const refreshToken = this.jwtService.sign(
       { id: userId },
-      { expiresIn: '1d' },
+      { expiresIn: '1m' },
     );
 
     return Ok({

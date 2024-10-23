@@ -29,12 +29,12 @@ import {
 import { GetCategoryListResponse } from './model/get-category-list.model';
 import { CommentService } from '@comment/application/comment/service/comment.service';
 import {
-  GetProduct,
   GetProductQuery,
   GetProductResponse,
 } from './model/get-product-list.model';
 import { CommentOrderBy } from '@comment/application/comment/database/enum/comment-order-by.enum';
 import { Pagination } from '@common/pagination/pagination.model';
+import { IPaginatedResult } from '@common/pagination/paginated-result.interface';
 
 @Controller('dashboard')
 @UseGuards(AuthGuard, RBACGuard)
@@ -101,11 +101,15 @@ export class DashboardHttpController extends AbstractHttpController {
     @Query() query: GetProductQuery,
   ) {
     const pagination = new Pagination(1);
-    const productListRes = await this.productService.getProductList();
+    const productListRes = await this.productService.getProductList({
+      skip: pagination.getSkip(),
+      limit: pagination.getLimit(),
+    });
     if (productListRes.isError()) {
       this.sendResult(response, productListRes);
       return;
     }
+
     switch (query.orderBy) {
       case CommentOrderBy.LIKE: {
         const commentListRes = await this.commentService.getComments({
@@ -117,9 +121,9 @@ export class DashboardHttpController extends AbstractHttpController {
           return;
         }
 
-        const result: GetProduct[] = [];
+        const result = [];
         commentListRes.value.map((x) => {
-          const product = productListRes.value.find(
+          const product = productListRes.value.list.find(
             (product) => x == product.id,
           );
           if (product) {
@@ -143,8 +147,11 @@ export class DashboardHttpController extends AbstractHttpController {
 
         this.sendResult(
           response,
-          Ok<GetProductResponse>({
+          Ok<IPaginatedResult<GetProductResponse>>({
             list: result,
+            total: productListRes.value.total,
+            page: productListRes.value.page,
+            pageSize: productListRes.value.pageSize,
           }),
         );
       }
@@ -152,8 +159,8 @@ export class DashboardHttpController extends AbstractHttpController {
 
     this.sendResult(
       response,
-      Ok<GetProductResponse>({
-        list: productListRes.value.map((x) => ({
+      Ok<IPaginatedResult<GetProductResponse>>({
+        list: productListRes.value.list.map((x) => ({
           id: x.id,
           title: x.title,
           description: x.description,
@@ -168,6 +175,9 @@ export class DashboardHttpController extends AbstractHttpController {
           createdAt: x.createdAt.toISOString(),
           category: { id: x.category.id },
         })),
+        total: productListRes.value.total,
+        page: productListRes.value.page,
+        pageSize: productListRes.value.pageSize,
       }),
     );
   }
