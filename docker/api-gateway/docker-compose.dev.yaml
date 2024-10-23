@@ -13,6 +13,8 @@ services:
       - "traefik.http.routers.shop-backend.entrypoints=websecure"
       - "traefik.http.routers.shop-backend.tls.certresolver=myresolver"
       - "traefik.http.services.shop-backend.loadbalancer.server.port=3010"
+    ports:
+      - 3010:3010
 
 networks:
   web:
