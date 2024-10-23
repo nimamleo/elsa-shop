@@ -6,10 +6,15 @@ import { AuthGuard } from './http/guard/auth.guard';
 import { DashboardHttpController } from './http/controllers/dashboard/dashboard-http.controller';
 import { ProductModule } from '@product/application/product/product.module';
 import { CommentModule } from '@comment/application/comment/comment.module';
+import { HealthCheckController } from './http/controllers/health/health-check.controller';
 
 @Module({
   imports: [UserModule, AuthModule, ProductModule, CommentModule],
-  controllers: [AuthHttpController, DashboardHttpController],
+  controllers: [
+    AuthHttpController,
+    DashboardHttpController,
+    HealthCheckController,
+  ],
   providers: [AuthGuard],
 })
 export class IoModule {}
