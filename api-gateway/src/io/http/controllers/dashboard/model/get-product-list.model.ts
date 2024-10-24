@@ -1,8 +1,10 @@
-import { CommentOrderBy } from '@comment/application/comment/database/enum/comment-order-by.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Order } from '@common/type/order';
-import { OrderType } from '@common/enums/order-by.enum';
+import { OrderType } from '@common/enums/order-type.enum';
 import { IsEnum, IsOptional } from 'class-validator';
+import { CommentOrderBy } from '@comment/application/comment/database/enum/comment-order-by.enum';
+import { PaymentOrderBy } from '@payment/application/payment/enum/payment-order-by.enum';
+import { GetProductBy } from '../enum/get-product-list.enum';
 
 export class GetProductRequest {}
 export class CategoryResponse {
@@ -51,10 +53,10 @@ export class GetProductResponse {
 }
 
 export class GetProductQuery {
-  @ApiProperty({ enum: CommentOrderBy, required: false })
+  @ApiProperty({ enum: GetProductBy, required: false })
   @IsOptional()
-  @IsEnum(CommentOrderBy)
-  orderBy: CommentOrderBy;
+  @IsEnum(GetProductBy)
+  orderBy: GetProductBy;
 
   @ApiProperty({ enum: OrderType, required: false })
   @IsOptional()

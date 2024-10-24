@@ -35,6 +35,11 @@ import {
 import { CommentOrderBy } from '@comment/application/comment/database/enum/comment-order-by.enum';
 import { Pagination } from '@common/pagination/pagination.model';
 import { IPaginatedResult } from '@common/pagination/paginated-result.interface';
+import { PaymentService } from '@payment/application/payment/service/payment.service';
+import { PaymentOrderBy } from '@payment/application/payment/enum/payment-order-by.enum';
+import { GetProductBy } from './enum/get-product-list.enum';
+import { ProductOrderBy } from '@product/application/product/enum/product-order-by.enum';
+import { IProductEntity } from '@product/application/product/models/product.model';
 
 @Controller('dashboard')
 @UseGuards(AuthGuard, RBACGuard)
@@ -44,6 +49,7 @@ import { IPaginatedResult } from '@common/pagination/paginated-result.interface'
 export class DashboardHttpController extends AbstractHttpController {
   constructor(
     private readonly productService: ProductService,
+    private readonly paymentService: PaymentService,
     private readonly commentService: CommentService,
   ) {
     super();
@@ -101,66 +107,76 @@ export class DashboardHttpController extends AbstractHttpController {
     @Query() query: GetProductQuery,
   ) {
     const pagination = new Pagination(1);
+
+    let productIds: string[] = [];
+    if (query.orderBy == GetProductBy.SCORE) {
+      const commentProductIdsRes =
+        await this.commentService.getCommentProductIds(
+          query.orderType,
+          CommentOrderBy.SCORE,
+          {
+            skip: pagination.getSkip(),
+            limit: pagination.getLimit(),
+          },
+        );
+      if (commentProductIdsRes.isError()) {
+        this.sendResult(response, commentProductIdsRes);
+        return;
+      }
+
+      productIds = commentProductIdsRes.value.list;
+    } else if (query.orderBy == GetProductBy.SALE) {
+      const paymentProductIdsRes =
+        await this.paymentService.getPaymentProductIds(
+          {
+            skip: pagination.getSkip(),
+            limit: pagination.getLimit(),
+          },
+          query.orderType,
+          PaymentOrderBy.SALE,
+        );
+
+      if (paymentProductIdsRes.isError()) {
+        this.sendResult(response, paymentProductIdsRes);
+        return;
+      }
+      productIds = paymentProductIdsRes.value.list;
+    }
+
     const productListRes = await this.productService.getProductList({
-      skip: pagination.getSkip(),
-      limit: pagination.getLimit(),
+      limitation: {
+        skip: 0,
+        limit: productIds.length,
+      },
+      productIds: productIds,
+      orderType: query.orderType,
+      orderBy:
+        query.orderBy == GetProductBy.CREATED_AT
+          ? ProductOrderBy.CREATED_AT
+          : ProductOrderBy.PRICE,
     });
     if (productListRes.isError()) {
       this.sendResult(response, productListRes);
       return;
     }
 
-    switch (query.orderBy) {
-      case CommentOrderBy.LIKE: {
-        const commentListRes = await this.commentService.getComments({
-          orderType: query.orderType,
-          orderBy: query.orderBy,
-        });
-        if (commentListRes.isError()) {
-          this.sendResult(response, commentListRes);
-          return;
-        }
-
-        const result = [];
-        commentListRes.value.map((x) => {
-          const product = productListRes.value.list.find(
-            (product) => x == product.id,
-          );
-          if (product) {
-            result.push({
-              id: product.id,
-              title: product.title,
-              description: product.description,
-              price: product.price,
-              country: product.country,
-              quality: product.quality,
-              info: product.info.map((x) => ({
-                size: x.size,
-                color: x.color,
-                count: x.count,
-              })),
-              createdAt: product.createdAt.toISOString(),
-              category: { id: product.category.id },
-            });
-          }
-        });
-
-        this.sendResult(
-          response,
-          Ok<IPaginatedResult<GetProductResponse>>({
-            list: result,
-            total: productListRes.value.total,
-            page: productListRes.value.page,
-            pageSize: productListRes.value.pageSize,
-          }),
-        );
+    let result: IProductEntity[] = [];
+    for (const x of productIds) {
+      const target = productListRes.value.list.find(
+        (product) => product.id == x,
+      );
+      if (target) {
+        result.push(target);
       }
+    }
+    if (result.length == 0) {
+      result = productListRes.value.list;
     }
 
     this.sendResult(
       response,
       Ok<IPaginatedResult<GetProductResponse>>({
-        list: productListRes.value.list.map((x) => ({
+        list: result.map((x) => ({
           id: x.id,
           title: x.title,
           description: x.description,

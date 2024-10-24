@@ -10,6 +10,7 @@ import { ICategory, ICategoryEntity } from '../models/category.model';
 import { IPaginatedResult } from '@common/pagination/paginated-result.interface';
 import { PaginationResult } from '@common/pagination/paginatio-result';
 import { ILimitation } from '@common/pagination/limitation.interface';
+import { GetProductList } from './dto/get-product-list.dto';
 
 @Injectable()
 export class ProductService {
@@ -51,15 +52,18 @@ export class ProductService {
 
   @HandleError
   async getProductList(
-    limitation: ILimitation,
+    dto: GetProductList,
   ): Promise<Result<IPaginatedResult<IProductEntity>>> {
     const res = await this.productDatabaseProvider.getProductList({
-      limitation: limitation,
+      limitation: dto.limitation,
+      productIds: dto.productIds,
+      orderBy: dto.orderBy,
+      orderType: dto.orderType,
     });
     if (res.isError()) {
       return Err(res.err);
     }
 
-    return Ok(new PaginationResult(res.value[0], res.value[1], limitation));
+    return Ok(new PaginationResult(res.value[0], res.value[1], dto.limitation));
   }
 }

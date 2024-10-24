@@ -11,6 +11,7 @@ import { CategoryEntity } from '../entities/category.entity';
 import { Product1729446557373 } from '@infrastructure/infrastructure/database/pgsql/migrations/product/1729446557373-product.migration';
 import { InfoEntity } from '../entities/info.entity';
 import { GetProductList } from './dto/get-product-list.dto';
+import { ProductOrderBy } from '../../../enum/product-order-by.enum';
 
 @Injectable()
 export class ProductPgsqlService implements IProductDatabaseProvider {
@@ -73,9 +74,32 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
   async getProductList(
     queryable: GetProductList,
   ): Promise<Result<[IProductEntity[], number]>> {
-    const [res, count] = await this.productRepository
+    if (!queryable.orderType) {
+      queryable.orderType = 'DESC';
+    }
+    if (!queryable.orderBy) {
+      queryable.orderBy = ProductOrderBy.CREATED_AT;
+    }
+
+    const query = this.productRepository
       .createQueryBuilder('p')
-      .leftJoinAndSelect('p.info', 'i')
+      .leftJoinAndSelect('p.info', 'i');
+
+    if (queryable.productIds && queryable.productIds.length > 0) {
+      query.where('p.id in (:...ids)', { ids: queryable.productIds });
+    }
+
+    switch (queryable.orderBy) {
+      case ProductOrderBy.CREATED_AT: {
+        query.orderBy('p.createdAt', queryable.orderType);
+        break;
+      }
+      case ProductOrderBy.PRICE: {
+        query.orderBy('p.price', queryable.orderType);
+      }
+    }
+
+    const [res, count] = await query
       .skip(queryable.limitation.skip)
       .limit(queryable.limitation.limit)
       .getManyAndCount();

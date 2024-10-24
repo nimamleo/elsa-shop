@@ -1,34 +1,31 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
-  COMMENT_DATABASE_PROVIDER,
-  ICommentDatabaseProvider,
-} from '../database/provider/comment.provider';
-import { HandleError } from '@common/decorators/handle-error.decorator';
+  IPaymentDatabaseProvider,
+  PAYMENT_DATABASE_PROVIDER,
+} from '../database/provider/payment.provider';
 import { Err, Ok, Result } from '@common/result';
 import { IPaginatedResult } from '@common/pagination/paginated-result.interface';
-import { OrderType } from '@common/enums/order-type.enum';
-import { CommentOrderBy } from '../database/enum/comment-order-by.enum';
 import { ILimitation } from '@common/pagination/limitation.interface';
+import { PaymentOrderBy } from '../enum/payment-order-by.enum';
 import { PaginationResult } from '@common/pagination/paginatio-result';
 import { Order } from '@common/type/order';
 
 @Injectable()
-export class CommentService {
+export class PaymentService {
   constructor(
-    @Inject(COMMENT_DATABASE_PROVIDER)
-    private readonly commentDatabaseProvider: ICommentDatabaseProvider,
+    @Inject(PAYMENT_DATABASE_PROVIDER)
+    private readonly paymentDatabaseProvider: IPaymentDatabaseProvider,
   ) {}
 
-  @HandleError
-  async getCommentProductIds(
-    orderType: Order,
-    orderBy: CommentOrderBy,
+  async getPaymentProductIds(
     limitation: ILimitation,
+    orderType: Order,
+    orderBy: PaymentOrderBy,
   ): Promise<Result<IPaginatedResult<string>>> {
-    const res = await this.commentDatabaseProvider.getCommentProductIds({
-      orderType: orderType,
-      orderBy: orderBy,
+    const res = await this.paymentDatabaseProvider.getPaymentProductIds({
       limitation: limitation,
+      orderBy: orderBy,
+      orderType: orderType,
     });
     if (res.isError()) {
       return Err(res.err);

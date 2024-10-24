@@ -7,9 +7,16 @@ import { DashboardHttpController } from './http/controllers/dashboard/dashboard-
 import { ProductModule } from '@product/application/product/product.module';
 import { CommentModule } from '@comment/application/comment/comment.module';
 import { HealthCheckController } from './http/controllers/health/health-check.controller';
+import { PaymentModule } from '@payment/application/payment/payment.module';
 
 @Module({
-  imports: [UserModule, AuthModule, ProductModule, CommentModule],
+  imports: [
+    UserModule,
+    AuthModule,
+    ProductModule,
+    CommentModule,
+    PaymentModule,
+  ],
   controllers: [
     AuthHttpController,
     DashboardHttpController,

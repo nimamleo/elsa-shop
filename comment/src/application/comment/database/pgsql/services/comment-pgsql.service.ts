@@ -18,9 +18,11 @@ export class CommentPgsqlService implements ICommentDatabaseProvider {
   ) {}
 
   @HandleError
-  async getComments(queryable: GetCommentQueryable): Promise<Result<string[]>> {
+  async getCommentProductIds(
+    queryable: GetCommentQueryable,
+  ): Promise<Result<[string[], number]>> {
     if (!queryable.orderBy) {
-      queryable.orderBy = CommentOrderBy.LIKE;
+      queryable.orderBy = CommentOrderBy.SCORE;
     }
     if (!queryable.orderType) {
       queryable.orderType = 'DESC';
@@ -28,24 +30,24 @@ export class CommentPgsqlService implements ICommentDatabaseProvider {
 
     const query = this.commentRepository
       .createQueryBuilder('c')
-      .leftJoinAndSelect('c.likes', 'l')
       .select('c.targetId', 'targetId')
       .addSelect('ROUND(AVG(c.score) ,1)', 'averageScore')
-      .addSelect('COUNT(l.id)', 'likeCount')
       .groupBy('c.targetId');
 
     switch (queryable.orderBy) {
-      case CommentOrderBy.LIKE: {
-        query.orderBy('"likeCount"', queryable.orderType);
-        break;
-      }
       case CommentOrderBy.SCORE: {
         query.orderBy('"averageScore"', queryable.orderType);
         break;
       }
     }
 
-    const res = await query.getRawMany();
-    return Ok(res.map((x) => x.targetId));
+    const res = await query
+      .skip(queryable.limitation.skip)
+      .limit(queryable.limitation.limit)
+      .getRawMany();
+
+    const count = await query.getCount();
+
+    return Ok([res.map((x) => x.targetId.toString()), count]);
   }
 }
