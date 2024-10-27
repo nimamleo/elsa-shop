@@ -31,6 +31,7 @@
       "@product/*": ["../product/src/*"],
       "@comment/*": ["../comment/src/*"],
       "@payment/*": ["../payment/src/*"],
+      "@asset/*": ["../asset/src/*"],
       "@auth/*": ["../auth/src/*"]
     }
   },

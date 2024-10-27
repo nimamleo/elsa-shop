@@ -8,6 +8,7 @@ export interface IAsset {
   mimetype: AssetMimeType;
   size: number;
   directoryPath: string;
+  isPoster: boolean;
 }
 
 export interface IAssetEntity extends IAsset, IEntity, IDated {}

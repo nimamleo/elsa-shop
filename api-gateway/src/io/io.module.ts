@@ -8,6 +8,7 @@ import { ProductModule } from '@product/application/product/product.module';
 import { CommentModule } from '@comment/application/comment/comment.module';
 import { HealthCheckController } from './http/controllers/health/health-check.controller';
 import { PaymentModule } from '@payment/application/payment/payment.module';
+import { AssetModule } from '@asset/application/asset/asset.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PaymentModule } from '@payment/application/payment/payment.module';
     ProductModule,
     CommentModule,
     PaymentModule,
+    AssetModule,
   ],
   controllers: [
     AuthHttpController,

@@ -5,7 +5,9 @@ import {
   Post,
   Query,
   Res,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -19,7 +21,13 @@ import { AuthGuard } from '../../guard/auth.guard';
 import { RBACGuard } from '../../guard/rbac.guard';
 import { RBAC } from '../../decorators/rbac.decorator';
 import { Role } from '@user/application/user/enum/role.enum';
-import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Ok } from '@common/result';
 import { Response } from 'express';
 import {
@@ -40,6 +48,9 @@ import { PaymentOrderBy } from '@payment/application/payment/enum/payment-order-
 import { GetProductBy } from './enum/get-product-list.enum';
 import { ProductOrderBy } from '@product/application/product/enum/product-order-by.enum';
 import { IProductEntity } from '@product/application/product/models/product.model';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { Multer } from 'multer';
+import { AssetService } from '@asset/application/asset/service/asset.service';
 
 @Controller('dashboard')
 @UseGuards(AuthGuard, RBACGuard)
@@ -51,6 +62,7 @@ export class DashboardHttpController extends AbstractHttpController {
     private readonly productService: ProductService,
     private readonly paymentService: PaymentService,
     private readonly commentService: CommentService,
+    private readonly assetService: AssetService,
   ) {
     super();
   }
@@ -243,5 +255,29 @@ export class DashboardHttpController extends AbstractHttpController {
         })),
       }),
     );
+  }
+
+  @Post('upload')
+  @UseInterceptors(FilesInterceptor('files'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  async uploadFile(
+    @Res() response: Response,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ) {
+    console.log(files);
   }
 }

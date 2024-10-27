@@ -25,6 +25,9 @@ export class AssetEntity {
   @Column({ type: 'int' })
   size: number;
 
+  @Column({ type: 'boolean' })
+  isPoster: boolean;
+
   @Column({ type: 'varchar', length: 255 })
   directoryPath: string;
 
@@ -46,6 +49,7 @@ export class AssetEntity {
     asset.directoryPath = iAsset.directoryPath;
     asset.targetId = Number(iAsset.targetId);
     asset.size = iAsset.size;
+    asset.isPoster = iAsset.isPoster;
 
     return asset;
   }
@@ -62,6 +66,7 @@ export class AssetEntity {
       name: asset.name,
       mimetype: asset.mimetype,
       size: asset.size,
+      isPoster: asset.isPoster,
       createdAt: asset.createdAt,
       updatedAt: asset.updatedAt,
     };
