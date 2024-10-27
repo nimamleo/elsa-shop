@@ -5,10 +5,11 @@ import { IDated } from '@common/interfaces/dated.interface';
 export interface IAsset {
   targetId: string;
   name: string;
-  mimetype: AssetMimeType;
+  mimetype: string;
   size: number;
   directoryPath: string;
   isPoster: boolean;
+  buffer?: Buffer;
 }
 
 export interface IAssetEntity extends IAsset, IEntity, IDated {}

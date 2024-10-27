@@ -8,7 +8,6 @@ import { DataSource, EntityManager, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { ICategory, ICategoryEntity } from '../../../models/category.model';
 import { CategoryEntity } from '../entities/category.entity';
-import { Product1729446557373 } from '@infrastructure/infrastructure/database/pgsql/migrations/product/1729446557373-product.migration';
 import { InfoEntity } from '../entities/info.entity';
 import { GetProductList } from './dto/get-product-list.dto';
 import { ProductOrderBy } from '../../../enum/product-order-by.enum';
@@ -53,7 +52,7 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
   }
 
   @HandleError
-  async CreateCategory(iCategory: ICategory): Promise<Result<ICategoryEntity>> {
+  async createCategory(iCategory: ICategory): Promise<Result<ICategoryEntity>> {
     const res = await this.categoryRepository.save(
       CategoryEntity.fromICategory(iCategory),
     );
@@ -105,5 +104,15 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
       .getManyAndCount();
 
     return Ok([res.map((x) => ProductEntity.toIProductEntity(x)), count]);
+  }
+
+  @HandleError
+  async deleteProduct(id: string): Promise<Result<boolean>> {
+    const res = await this.productRepository.delete(id);
+    if (res.affected == 0) {
+      return Err('something went wrong');
+    }
+
+    return Ok(true);
   }
 }

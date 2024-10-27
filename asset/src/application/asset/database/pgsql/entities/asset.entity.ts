@@ -20,7 +20,7 @@ export class AssetEntity {
   name: string;
 
   @Column({ type: 'varchar', length: 255 })
-  mimetype: AssetMimeType;
+  mimetype: string;
 
   @Column({ type: 'int' })
   size: number;

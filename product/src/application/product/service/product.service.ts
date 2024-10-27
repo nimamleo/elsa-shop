@@ -32,7 +32,7 @@ export class ProductService {
 
   @HandleError
   async CreateCategory(iCategory: ICategory): Promise<Result<ICategoryEntity>> {
-    const res = await this.productDatabaseProvider.CreateCategory(iCategory);
+    const res = await this.productDatabaseProvider.createCategory(iCategory);
     if (res.isError()) {
       return Err(res.err);
     }
@@ -65,5 +65,15 @@ export class ProductService {
     }
 
     return Ok(new PaginationResult(res.value[0], res.value[1], dto.limitation));
+  }
+
+  @HandleError
+  async deleteProduct(id: string): Promise<Result<boolean>> {
+    const res = await this.productDatabaseProvider.deleteProduct(id);
+    if (res.isError()) {
+      return Err(res.err);
+    }
+
+    return Ok(res.value);
   }
 }

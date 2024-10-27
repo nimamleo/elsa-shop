@@ -13,7 +13,9 @@ export interface IProductReader {
 export interface IProductWriter {
   createProduct(iProduct: IProduct): Promise<Result<IProductEntity>>;
 
-  CreateCategory(iCategory: ICategory): Promise<Result<ICategoryEntity>>;
+  createCategory(iCategory: ICategory): Promise<Result<ICategoryEntity>>;
+
+  deleteProduct(id: string): Promise<Result<boolean>>;
 }
 export interface IProductDatabaseProvider
   extends IProductReader,
