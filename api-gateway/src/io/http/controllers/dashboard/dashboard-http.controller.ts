@@ -74,18 +74,7 @@ export class DashboardHttpController extends AbstractHttpController {
   @UseInterceptors(FilesInterceptor('files'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        files: {
-          type: 'array',
-          items: {
-            type: 'string',
-            format: 'binary',
-          },
-        },
-      },
-    },
+    type: CreateProductRequest,
   })
   async createProduct(
     @Res() response: Response,

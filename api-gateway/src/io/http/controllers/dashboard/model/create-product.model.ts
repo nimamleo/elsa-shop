@@ -3,14 +3,15 @@ import { Country } from '@product/application/product/enum/country.enum';
 import {
   IsArray,
   IsEnum,
+  IsInt,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
   IsString,
 } from 'class-validator';
-import { ICategoryEntity } from '@product/application/product/models/category.model';
 import { ApiProperty } from '@nestjs/swagger';
 import { Size } from '@product/application/product/enum/size.enum';
+import { Transform, TransformFnParams } from 'class-transformer';
 
 export class CreateProductInfo {
   @ApiProperty()
@@ -18,7 +19,7 @@ export class CreateProductInfo {
   @IsString()
   color: string;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'enum', enum: Size })
   @IsNotEmpty()
   @IsEnum(Size)
   size: Size;
@@ -40,17 +41,18 @@ export class CreateProductRequest {
   @ApiProperty()
   description: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
-  @ApiProperty()
+  @Transform(({ value }: TransformFnParams) => Number(value))
   price: number;
 
   @IsNotEmpty()
   @IsEnum(Quality)
-  @ApiProperty()
+  @ApiProperty({ type: 'enum', enum: Quality })
   quality: Quality;
 
-  @ApiProperty()
+  @ApiProperty({ type: 'enum', enum: Country })
   @IsNotEmpty()
   @IsEnum(Country)
   country: Country;
@@ -61,8 +63,10 @@ export class CreateProductRequest {
   categoryId: string;
 
   @ApiProperty({ type: [CreateProductInfo] })
-  @IsArray()
   info: CreateProductInfo[];
+
+  @ApiProperty({ type: 'string', format: 'binary', isArray: true })
+  files: string[];
 }
 
 export class CategoryResponse {
