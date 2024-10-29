@@ -9,6 +9,7 @@ services:
       - ./.env
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=web"
       - "traefik.http.routers.shop-backend.rule=Host(`back-dev.elsa-gallery.shop`)"
       - "traefik.http.routers.shop-backend.entrypoints=websecure"
       - "traefik.http.routers.shop-backend.tls.certresolver=myresolver"
