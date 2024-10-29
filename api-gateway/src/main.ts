@@ -36,9 +36,11 @@ async function main() {
     .setVersion('1.0')
     .addBearerAuth({ type: 'http', scheme: 'bearer', in: 'header' })
     .build();
+
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig, {
     deepScanRoutes: true,
   });
+
   SwaggerModule.setup('swagger', app, swaggerDocument, {
     explorer: true,
     swaggerOptions: {
@@ -46,6 +48,8 @@ async function main() {
     },
     customCss: darkStyle,
   });
+
+  app.enableCors();
 
   await app.init();
   await app.listen(appConfig.port);
