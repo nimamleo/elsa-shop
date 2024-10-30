@@ -73,14 +73,12 @@ export class DashboardHttpController extends AbstractHttpController {
   @ApiBody({ type: CreateProductRequest })
   @UseInterceptors(FilesInterceptor('files'))
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    type: CreateProductRequest,
-  })
   async createProduct(
     @Res() response: Response,
     @Body() body: CreateProductRequest,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
+    console.log(body);
     const createProduct = await this.productService.createProduct({
       title: body.title,
       description: body.description,

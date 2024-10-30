@@ -8,10 +8,12 @@ import {
   IsNumber,
   IsNumberString,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Size } from '@product/application/product/enum/size.enum';
-import { Transform, TransformFnParams } from 'class-transformer';
+import { Transform, TransformFnParams, Type } from 'class-transformer';
+import * as console from 'node:console';
 
 export class CreateProductInfo {
   @ApiProperty()
@@ -62,11 +64,16 @@ export class CreateProductRequest {
   @IsNumberString()
   categoryId: string;
 
-  @ApiProperty({ type: [CreateProductInfo] })
-  info: CreateProductInfo[];
-
   @ApiProperty({ type: 'string', format: 'binary', isArray: true })
   files: string[];
+
+  @ApiProperty({
+    type: [CreateProductInfo],
+  })
+  @IsArray()
+  @Transform(({ value }) => (Array.isArray(value) ? value : Array(value)))
+  @Type(() => CreateProductInfo)
+  info: CreateProductInfo[];
 }
 
 export class CategoryResponse {
