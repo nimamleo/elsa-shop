@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AssetCoreModule } from '@infrastructure/infrastructure/asset/asset-core.module';
 import { ASSET_STORAGE_PROVIDER } from './provider/storage.provider';
 import { StorageS3Service } from './S3/storage-s3.service';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [AssetCoreModule, ConfigModule],

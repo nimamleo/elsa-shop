@@ -8,9 +8,11 @@ export class AssetService implements IAssetProvider {
   constructor(accessKey: string, secretKey: string) {
     this.S3 = new S3Client({
       credentials: {
-        accessKeyId: accessKey,
-        secretAccessKey: secretKey,
+        accessKeyId: 'MKUcANO4Q8KKJWUO',
+        secretAccessKey: 'b6Bru0IAAtMWZPmXzmkY2V38WgpJsFF7',
       },
+      endpoint: 'https://parspack.net',
+      region: 'us-west-2',
     });
   }
 

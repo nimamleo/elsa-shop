@@ -51,6 +51,8 @@ import { IProductEntity } from '@product/application/product/models/product.mode
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Multer } from 'multer';
 import { AssetService } from '@asset/application/asset/service/asset.service';
+import { UploadFilesRequest } from './model/upload-files.model';
+import { localBinExists } from '@nestjs/cli/lib/utils/local-binaries';
 
 @Controller('dashboard')
 @UseGuards(AuthGuard, RBACGuard)
@@ -71,14 +73,10 @@ export class DashboardHttpController extends AbstractHttpController {
   @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiResponse({ type: CreateProductResponse })
   @ApiBody({ type: CreateProductRequest })
-  @UseInterceptors(FilesInterceptor('files'))
-  @ApiConsumes('multipart/form-data')
   async createProduct(
     @Res() response: Response,
     @Body() body: CreateProductRequest,
-    @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    console.log(body);
     const createProduct = await this.productService.createProduct({
       title: body.title,
       description: body.description,
@@ -95,33 +93,6 @@ export class DashboardHttpController extends AbstractHttpController {
     if (createProduct.isError()) {
       this.sendResult(response, createProduct);
       return;
-    }
-    for (const file of files) {
-      if (file.size > 2 * 1024 * 1024) {
-        this.sendResult(response, Err('file should be less than 2MB'));
-        return;
-      }
-
-      const validMimeTypes = ['image/png', 'image/jpeg'];
-      if (!validMimeTypes.includes(file.mimetype)) {
-        this.sendResult(response, Err('file can be PNG or JPEG'));
-        return;
-      }
-
-      const uploadRes = await this.assetService.createFile({
-        name: file.originalname,
-        size: file.size,
-        directoryPath: null,
-        mimetype: file.mimetype,
-        buffer: file.buffer,
-        isPoster: false,
-        targetId: createProduct.value.id,
-      });
-      if (uploadRes.isError()) {
-        await this.productService.deleteProduct(createProduct.value.id);
-        this.sendResult(response, createProduct);
-        return;
-      }
     }
 
     this.sendResult(
@@ -291,22 +262,37 @@ export class DashboardHttpController extends AbstractHttpController {
   @Post('upload')
   @UseInterceptors(FilesInterceptor('files'))
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        files: {
-          type: 'array',
-          items: {
-            type: 'string',
-            format: 'binary',
-          },
-        },
-      },
-    },
-  })
+  @ApiConsumes('multipart/form-data')
   async uploadFile(
     @Res() response: Response,
-    @UploadedFiles() files: Express.Multer.File[],
-  ) {}
+    @Body() body: UploadFilesRequest,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ) {
+    for (const file of files) {
+      if (file.size > 2 * 1024 * 1024) {
+        this.sendResult(response, Err('file should be less than 2MB'));
+        return;
+      }
+
+      const validMimeTypes = ['image/png', 'image/jpeg'];
+      if (!validMimeTypes.includes(file.mimetype)) {
+        this.sendResult(response, Err('file can be PNG or JPEG'));
+        return;
+      }
+
+      const uploadRes = await this.assetService.createFile({
+        name: file.originalname,
+        size: file.size,
+        directoryPath: null,
+        mimetype: file.mimetype,
+        buffer: file.buffer,
+        isPoster: false,
+        targetId: body.productId,
+      });
+      if (uploadRes.isError()) {
+        this.sendResult(response, uploadRes);
+        return;
+      }
+    }
+  }
 }

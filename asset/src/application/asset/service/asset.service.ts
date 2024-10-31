@@ -27,7 +27,7 @@ export class AssetService {
 
   @HandleError
   async createFile(iAsset: IAsset): Promise<Result<IAssetEntity>> {
-    iAsset.name = `${iAsset.name}-${new Date()}`;
+    iAsset.name = `${Date.now()}-${iAsset.name}`;
     iAsset.directoryPath = `images/${iAsset.name}`;
 
     const saveToDb = await this.assetDatabaseProvider.createAsset(iAsset);

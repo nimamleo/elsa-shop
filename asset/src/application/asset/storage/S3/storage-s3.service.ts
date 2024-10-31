@@ -25,15 +25,16 @@ export class StorageS3Service implements IAssetStorageProvider {
     configService: ConfigService,
   ) {
     this.assetConfig = configService.get(PARSPACK_BUCKET_TOKEN);
+    console.log(configService.get(PARSPACK_BUCKET_TOKEN));
   }
 
   @HandleError
   async uploadFile(file: IAsset): Promise<Result<boolean>> {
     const command = new PutObjectCommand({
+      Bucket: 'c961156',
       Key: file.directoryPath,
-      Bucket: this.assetConfig.name,
+      // ACL: 'public-read',
       Body: file.buffer,
-      ContentLength: file.buffer.length,
     });
     const result = await this.storageProvider.getS3CLinet().send(command);
     if (!result) {

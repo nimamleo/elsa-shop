@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsNumberString,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -17,17 +18,17 @@ import * as console from 'node:console';
 
 export class CreateProductInfo {
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   color: string;
 
   @ApiProperty({ type: 'enum', enum: Size })
-  @IsNotEmpty()
+  @IsOptional()
   @IsEnum(Size)
   size: Size;
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   count: number;
 }
@@ -64,14 +65,15 @@ export class CreateProductRequest {
   @IsNumberString()
   categoryId: string;
 
-  @ApiProperty({ type: 'string', format: 'binary', isArray: true })
-  files: string[];
+  // @ApiProperty({ type: 'string', format: 'binary', isArray: true })
+  // files: string[];
 
   @ApiProperty({
     type: [CreateProductInfo],
   })
   @IsArray()
-  @Transform(({ value }) => (Array.isArray(value) ? value : Array(value)))
+  // @Transform(({ value }) => (Array.isArray(value) ? value : Array(value)))
+  // @ValidateNested({ each: true })
   @Type(() => CreateProductInfo)
   info: CreateProductInfo[];
 }
