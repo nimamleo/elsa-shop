@@ -1,9 +1,11 @@
 import { ConfigFactory, registerAs } from '@nestjs/config';
 import { IAssetConfig } from './asset.config';
+import * as process from 'node:process';
 
 export interface IParspackConfig extends IAssetConfig {
   accessKey: string;
   secretKey: string;
+  endpointUrl: string;
   name: string;
 }
 
@@ -25,9 +27,14 @@ export const parspackConfig = registerAs<
     throw new Error('BUCKET_NAME not provided');
   }
 
+  if (!process.env.BUCKET_ENDPOINT_URL) {
+    throw new Error('BUCKET_ENDPOINT_URL not provided');
+  }
+
   return {
     accessKey: process.env.BUCKET_ACCESS_KEY,
     secretKey: process.env.BUCKET_SECRET_KEY,
+    endpointUrl: process.env.BUCKET_ENDPOINT_URL,
     name: process.env.BUCKET_NAME,
   };
 });

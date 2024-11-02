@@ -6,6 +6,8 @@ import { HandleError } from '@common/decorators/handle-error.decorator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AssetEntity } from '../entities/asset.entity';
 import { Repository } from 'typeorm';
+import { ILimitation } from '@common/pagination/limitation.interface';
+import { response } from 'express';
 
 @Injectable()
 export class AssetPgsqlService implements IAssetDatabaseProvider {
@@ -47,5 +49,20 @@ export class AssetPgsqlService implements IAssetDatabaseProvider {
     }
 
     return Ok(true);
+  }
+
+  @HandleError
+  async getAssetListByTargetIds(
+    targetIds: string[],
+    limitation: ILimitation,
+  ): Promise<Result<[IAssetEntity[], number]>> {
+    const [res, count] = await this.assetRepository
+      .createQueryBuilder('a')
+      .where('a.targetId in (:...ids)', { ids: targetIds })
+      .offset(limitation.skip)
+      .limit(limitation.limit)
+      .getManyAndCount();
+
+    return Ok([res.map((x) => AssetEntity.toIAssetEntity(x)), count]);
   }
 }

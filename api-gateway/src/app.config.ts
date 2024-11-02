@@ -1,0 +1,21 @@
+import { ConfigFactory, registerAs } from '@nestjs/config';
+import * as process from 'node:process';
+
+export interface IAppConfig {
+  baseUrl: string;
+}
+
+export const APP_CONFIG_TOKEN = 'app-config-token';
+
+export const appConfig = registerAs<IAppConfig, ConfigFactory<IAppConfig>>(
+  APP_CONFIG_TOKEN,
+  () => {
+    if (!process.env.APP_BASE_URL) {
+      throw new Error('APP_BASE_URL not provided');
+    }
+
+    return {
+      baseUrl: process.env.APP_BASE_URL,
+    };
+  },
+);

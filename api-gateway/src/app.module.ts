@@ -5,12 +5,13 @@ import { httpConfig } from './io/http/config/http.config';
 import { pgsqlConfig } from '@infrastructure/infrastructure/database/pgsql/config/pgsql.config';
 import { jwtConfig } from '@auth/application/auth/config/jwtConfig';
 import { parspackConfig } from '@infrastructure/infrastructure/asset/config/parspack.config';
+import { appConfig } from './app.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       cache: true,
-      load: [httpConfig, pgsqlConfig, jwtConfig, parspackConfig],
+      load: [httpConfig, pgsqlConfig, jwtConfig, parspackConfig, appConfig],
     }),
     IoModule,
   ],

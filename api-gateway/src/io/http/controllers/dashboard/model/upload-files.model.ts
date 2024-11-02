@@ -17,4 +17,30 @@ export class UploadFilesRequest {
   })
   files: Buffer[];
 }
-export class UploadFilesResponse {}
+export class UploadFilesResponse {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  targetId: string;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  mimetype: string;
+
+  @ApiProperty()
+  size: number;
+
+  @ApiProperty()
+  directoryPath: string;
+
+  @ApiProperty()
+  isPoster: boolean;
+}
+
+export class UploadFilesList {
+  @ApiProperty({ type: UploadFilesResponse })
+  list: UploadFilesResponse[];
+}

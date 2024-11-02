@@ -13,7 +13,10 @@ import {
 } from '@aws-sdk/client-s3';
 import { IAsset } from '../../model/asset.model';
 import { ConfigService } from '@nestjs/config';
-import { IParspackConfig } from '@infrastructure/infrastructure/asset/config/parspack.config';
+import {
+  IParspackConfig,
+  PARSPACK_CONFIG_TOKEN,
+} from '@infrastructure/infrastructure/asset/config/parspack.config';
 
 @Injectable()
 export class StorageS3Service implements IAssetStorageProvider {
@@ -24,16 +27,14 @@ export class StorageS3Service implements IAssetStorageProvider {
     private readonly storageProvider: IAssetProvider,
     configService: ConfigService,
   ) {
-    this.assetConfig = configService.get(PARSPACK_BUCKET_TOKEN);
-    console.log(configService.get(PARSPACK_BUCKET_TOKEN));
+    this.assetConfig = configService.get(PARSPACK_CONFIG_TOKEN);
   }
 
   @HandleError
   async uploadFile(file: IAsset): Promise<Result<boolean>> {
     const command = new PutObjectCommand({
-      Bucket: 'c961156',
+      Bucket: this.assetConfig.name,
       Key: file.directoryPath,
-      // ACL: 'public-read',
       Body: file.buffer,
     });
     const result = await this.storageProvider.getS3CLinet().send(command);

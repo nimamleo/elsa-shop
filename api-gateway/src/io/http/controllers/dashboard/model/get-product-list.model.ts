@@ -46,6 +46,9 @@ export class GetProductResponse {
   info: CreateProductInfoResponse[];
 
   @ApiProperty()
+  images: string[];
+
+  @ApiProperty()
   category: CategoryResponse;
 
   @ApiProperty()

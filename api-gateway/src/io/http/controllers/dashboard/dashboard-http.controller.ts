@@ -49,10 +49,16 @@ import { GetProductBy } from './enum/get-product-list.enum';
 import { ProductOrderBy } from '@product/application/product/enum/product-order-by.enum';
 import { IProductEntity } from '@product/application/product/models/product.model';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { Multer } from 'multer';
 import { AssetService } from '@asset/application/asset/service/asset.service';
-import { UploadFilesRequest } from './model/upload-files.model';
-import { localBinExists } from '@nestjs/cli/lib/utils/local-binaries';
+import {
+  UploadFilesList,
+  UploadFilesRequest,
+  UploadFilesResponse,
+} from './model/upload-files.model';
+import { GenericStatusCodes } from '@common/enums/status.enum';
+import { Multer } from 'multer';
+import { APP_CONFIG_TOKEN, IAppConfig } from '../../../../app.config';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('dashboard')
 @UseGuards(AuthGuard, RBACGuard)
@@ -60,13 +66,16 @@ import { localBinExists } from '@nestjs/cli/lib/utils/local-binaries';
 @ApiTags('dashboard')
 @ApiBearerAuth()
 export class DashboardHttpController extends AbstractHttpController {
+  private readonly appConfig: IAppConfig;
   constructor(
     private readonly productService: ProductService,
     private readonly paymentService: PaymentService,
     private readonly commentService: CommentService,
     private readonly assetService: AssetService,
+    configService: ConfigService,
   ) {
     super();
+    this.appConfig = configService.get(APP_CONFIG_TOKEN);
   }
 
   @Post('product')
@@ -174,13 +183,25 @@ export class DashboardHttpController extends AbstractHttpController {
       return;
     }
 
+    const assetList = await this.assetService.getAssetList(
+      productListRes.value.list.map((x) => x.id),
+      {
+        limit: productIds.length,
+        skip: 0,
+      },
+    );
+    if (assetList.isError()) {
+      this.sendResult(response, assetList);
+      return;
+    }
+
     let result: IProductEntity[] = [];
     for (const x of productIds) {
-      const target = productListRes.value.list.find(
+      const product = productListRes.value.list.find(
         (product) => product.id == x,
       );
-      if (target) {
-        result.push(target);
+      if (product) {
+        result.push(product);
       }
     }
     if (result.length == 0) {
@@ -190,21 +211,28 @@ export class DashboardHttpController extends AbstractHttpController {
     this.sendResult(
       response,
       Ok<IPaginatedResult<GetProductResponse>>({
-        list: result.map((x) => ({
-          id: x.id,
-          title: x.title,
-          description: x.description,
-          price: x.price,
-          country: x.country,
-          quality: x.quality,
-          info: x.info.map((i) => ({
-            size: i.size,
-            color: i.color,
-            count: i.count,
-          })),
-          createdAt: x.createdAt.toISOString(),
-          category: { id: x.category.id },
-        })),
+        list: result.map((x) => {
+          const res: GetProductResponse = {
+            id: x.id,
+            title: x.title,
+            description: x.description,
+            price: x.price,
+            country: x.country,
+            quality: x.quality,
+            info: x.info.map((i) => ({
+              size: i.size,
+              color: i.color,
+              count: i.count,
+            })),
+            images: assetList.value.list
+              .filter((i) => i.targetId == x.id)
+              .map((i) => `${this.appConfig.baseUrl}/${i.directoryPath}`),
+            createdAt: x.createdAt.toISOString(),
+            category: { id: x.category.id },
+          };
+
+          return res;
+        }),
         total: productListRes.value.total,
         page: productListRes.value.page,
         pageSize: productListRes.value.pageSize,
@@ -268,6 +296,7 @@ export class DashboardHttpController extends AbstractHttpController {
     @Body() body: UploadFilesRequest,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
+    const filesRes: UploadFilesResponse[] = [];
     for (const file of files) {
       if (file.size > 2 * 1024 * 1024) {
         this.sendResult(response, Err('file should be less than 2MB'));
@@ -293,6 +322,39 @@ export class DashboardHttpController extends AbstractHttpController {
         this.sendResult(response, uploadRes);
         return;
       }
+
+      filesRes.push({
+        id: uploadRes.value.id,
+        name: uploadRes.value.name,
+        size: uploadRes.value.size,
+        targetId: uploadRes.value.targetId,
+        mimetype: uploadRes.value.mimetype,
+        directoryPath: uploadRes.value.directoryPath,
+        isPoster: uploadRes.value.isPoster,
+      });
     }
+
+    if (filesRes.length !== files.length) {
+      this.sendResult(
+        response,
+        Err('something went wrong', GenericStatusCodes.INTERNAL),
+      );
+      return;
+    }
+
+    this.sendResult(
+      response,
+      Ok<UploadFilesList>({
+        list: filesRes.map((x) => ({
+          id: x.id,
+          name: x.name,
+          size: x.size,
+          targetId: x.targetId,
+          mimetype: x.mimetype,
+          directoryPath: x.directoryPath,
+          isPoster: x.isPoster,
+        })),
+      }),
+    );
   }
 }

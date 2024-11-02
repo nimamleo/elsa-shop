@@ -9,6 +9,7 @@ import { CommentModule } from '@comment/application/comment/comment.module';
 import { HealthCheckController } from './http/controllers/health/health-check.controller';
 import { PaymentModule } from '@payment/application/payment/payment.module';
 import { AssetModule } from '@asset/application/asset/asset.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AssetModule } from '@asset/application/asset/asset.module';
     CommentModule,
     PaymentModule,
     AssetModule,
+    ConfigModule,
   ],
   controllers: [
     AuthHttpController,
