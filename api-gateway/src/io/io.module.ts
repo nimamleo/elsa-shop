@@ -10,6 +10,7 @@ import { HealthCheckController } from './http/controllers/health/health-check.co
 import { PaymentModule } from '@payment/application/payment/payment.module';
 import { AssetModule } from '@asset/application/asset/asset.module';
 import { ConfigModule } from '@nestjs/config';
+import { UserHttpController } from './http/controllers/user/user-http.controller';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ConfigModule } from '@nestjs/config';
     AuthHttpController,
     DashboardHttpController,
     HealthCheckController,
+    UserHttpController,
   ],
   providers: [AuthGuard],
 })

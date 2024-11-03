@@ -87,4 +87,29 @@ export class ProductService {
 
     return Ok(res.value);
   }
+
+  @HandleError
+  async addToBasket(iBasket: IBasket): Promise<Result<IBasketEntity>> {
+    const getProduct = await this.productDatabaseProvider.getProductById(
+      iBasket.product.id,
+    );
+    if (getProduct.isError()) {
+      return Err(getProduct.err);
+    }
+
+    const info = getProduct.value.info.find((x) => x.id === iBasket.info.id);
+    if (info) {
+      if (info.count < iBasket.count) {
+        return Err('Apologies, we’re currently low on stock for this item.');
+      }
+    } else {
+      return Err('something went wrong');
+    }
+    const res = await this.productDatabaseProvider.addToBasket(iBasket);
+    if (res.isError()) {
+      return Err(res.err);
+    }
+
+    return Ok(res.value);
+  }
 }

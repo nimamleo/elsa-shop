@@ -6,11 +6,17 @@ import { CategoryEntity } from './pgsql/entities/category.entity';
 import { InfoEntity } from './pgsql/entities/info.entity';
 import { PRODUCT_DATABASE_PROVIDER } from './provider/product.provider';
 import { ProductPgsqlService } from './pgsql/service/product-pgsql.service';
+import { BasketEntity } from './pgsql/entities/basket.entity';
 
 @Module({
   imports: [
     CoreDatabaseModule.register(),
-    TypeOrmModule.forFeature([ProductEntity, CategoryEntity, InfoEntity]),
+    TypeOrmModule.forFeature([
+      ProductEntity,
+      CategoryEntity,
+      InfoEntity,
+      BasketEntity,
+    ]),
   ],
   providers: [
     {

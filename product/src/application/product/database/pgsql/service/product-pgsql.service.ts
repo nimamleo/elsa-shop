@@ -162,14 +162,12 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
 
         const updateBasket = await entityManager
           .getRepository(BasketEntity)
-          .createQueryBuilder()
-          .update()
-          .set({ count: getBasket.count + iBasket.count })
-          .where('id = :id', { id: iBasket.product.id })
-          .execute();
+          .update(getBasket.id, {
+            count: getBasket.count + iBasket.count,
+          });
 
         if (updateBasket.affected === 0) {
-          return;
+          return Err('something went wrong', GenericStatusCodes.INTERNAL);
         }
 
         return Ok(BasketEntity.toIBasketEntity(getBasket));
@@ -184,9 +182,25 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
     const res = await this.basketRepository
       .createQueryBuilder('b')
       .leftJoinAndSelect('b.product', 'p')
+      .leftJoinAndSelect('b.productInfo', 'i')
       .where('b.userId = :userId', { userId: userId })
       .getMany();
 
     return Ok(res.map((x) => BasketEntity.toIBasketEntity(x)));
+  }
+
+  @HandleError
+  async getProductById(id: string): Promise<Result<IProductEntity>> {
+    const res = await this.productRepository
+      .createQueryBuilder('p')
+      .leftJoinAndSelect('p.info', 'i')
+      .where('p.id = :id', { id: id })
+      .getOne();
+
+    if (!res) {
+      return Err('product not found', GenericStatusCodes.NOT_FOUND);
+    }
+
+    return Ok(ProductEntity.toIProductEntity(res));
   }
 }

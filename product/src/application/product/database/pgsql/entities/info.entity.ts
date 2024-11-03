@@ -4,12 +4,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Size } from '../../../enum/size.enum';
 import { ProductEntity } from './product.entity';
 import { IInfo, IInfoEntity } from '../../../models/info.model';
+import { BasketEntity } from './basket.entity';
 
 @Entity('info')
 export class InfoEntity {
@@ -31,6 +33,9 @@ export class InfoEntity {
   @ManyToOne(() => ProductEntity, (x) => x.info)
   @JoinColumn({ name: 'productId' })
   product: ProductEntity;
+
+  @OneToMany(() => BasketEntity, (x) => x.productInfo)
+  basket: BasketEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -65,6 +70,7 @@ export class InfoEntity {
       product: info.product
         ? ProductEntity.toIProductEntity(info.product)
         : { id: info.productId.toString() },
+      basket: [],
       createdAt: info.createdAt,
       updatedAt: info.updatedAt,
     };

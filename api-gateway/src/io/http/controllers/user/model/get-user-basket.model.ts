@@ -1,10 +1,10 @@
 export class GetUserBasketRequest {}
 export class GetUserBasketItem {
   id: string;
-  price: string;
+  price: number;
   title: string;
   image: string;
-  count: string;
+  count: number;
   size: string;
   color: string;
   quality: string;

@@ -4,11 +4,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { ProductEntity } from './product.entity';
 import { IBasket, IBasketEntity } from '../../../models/basket.model';
+import { InfoEntity } from './info.entity';
 
 @Entity('basket')
 export class BasketEntity {
@@ -24,6 +27,13 @@ export class BasketEntity {
   @ManyToOne(() => ProductEntity, (product) => product.basket)
   @JoinColumn({ name: 'productId' })
   product: ProductEntity;
+
+  @Column({ type: 'bigint', unsigned: true })
+  productInfoId: number;
+
+  @ManyToOne(() => InfoEntity, (x) => x.basket)
+  @JoinColumn({ name: 'infoId' })
+  productInfo: InfoEntity;
 
   @Column({ type: 'int' })
   count: number;
@@ -44,6 +54,7 @@ export class BasketEntity {
     basket.count = iBasket.count;
     basket.userId = Number(iBasket.userId);
     basket.productId = Number(iBasket.product.id);
+    basket.productInfoId = Number(iBasket.info.id);
 
     return basket;
   }
@@ -59,6 +70,9 @@ export class BasketEntity {
       product: basket.product
         ? ProductEntity.toIProductEntity(basket.product)
         : { id: basket.productId.toString() },
+      info: basket.productInfo
+        ? InfoEntity.toIInfoEntity(basket.productInfo)
+        : { id: basket.productInfoId.toString() },
       count: basket.count,
       createdAt: basket.createdAt,
       updatedAt: basket.updatedAt,
