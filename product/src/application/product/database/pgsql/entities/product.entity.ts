@@ -13,6 +13,7 @@ import { Country } from '../../../enum/country.enum';
 import { CategoryEntity } from './category.entity';
 import { InfoEntity } from './info.entity';
 import { IProduct, IProductEntity } from '../../../models/product.model';
+import { BasketEntity } from './basket.entity';
 
 @Entity('product')
 export class ProductEntity {
@@ -43,6 +44,9 @@ export class ProductEntity {
 
   @OneToMany(() => InfoEntity, (x) => x.product)
   info: InfoEntity[];
+
+  @OneToMany(() => BasketEntity, (x) => x.product)
+  basket: BasketEntity;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

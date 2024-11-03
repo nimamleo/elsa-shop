@@ -11,6 +11,9 @@ import { CategoryEntity } from '../entities/category.entity';
 import { InfoEntity } from '../entities/info.entity';
 import { GetProductList } from './dto/get-product-list.dto';
 import { ProductOrderBy } from '../../../enum/product-order-by.enum';
+import { IBasket, IBasketEntity } from '../../../models/basket.model';
+import { BasketEntity } from '../entities/basket.entity';
+import { GenericStatusCodes } from '@common/enums/status.enum';
 
 @Injectable()
 export class ProductPgsqlService implements IProductDatabaseProvider {
@@ -21,6 +24,8 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
     private readonly categoryRepository: Repository<CategoryEntity>,
     @InjectRepository(InfoEntity)
     private readonly infoRepository: Repository<InfoEntity>,
+    @InjectRepository(BasketEntity)
+    private readonly basketRepository: Repository<BasketEntity>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
   ) {}
@@ -114,5 +119,74 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
     }
 
     return Ok(true);
+  }
+
+  @HandleError
+  async getBasketByUserIdAndProductId(
+    userId: string,
+    productId: string,
+  ): Promise<Result<IBasketEntity>> {
+    const res = await this.basketRepository
+      .createQueryBuilder('b')
+      .where('b.userId = :userId', { userId: userId })
+      .andWhere('b.productId = :productId', { productId: productId })
+      .getOne();
+
+    if (!res) {
+      return Err('basket not found', GenericStatusCodes.NOT_FOUND);
+    }
+
+    return Ok(BasketEntity.toIBasketEntity(res));
+  }
+
+  @HandleError
+  async addToBasket(iBasket: IBasket): Promise<Result<IBasketEntity>> {
+    const res = await this.dataSource.transaction(
+      async (entityManager: EntityManager) => {
+        const getBasket = await entityManager
+          .getRepository(BasketEntity)
+          .createQueryBuilder('b')
+          .where('b.userId = :userId', { userId: iBasket.userId })
+          .andWhere('b.productId = :productId', {
+            productId: iBasket.product.id,
+          })
+          .getOne();
+
+        if (!getBasket) {
+          const createBasket = await this.basketRepository.save(
+            BasketEntity.fromIBasket(iBasket),
+          );
+
+          return Ok(BasketEntity.toIBasketEntity(createBasket));
+        }
+
+        const updateBasket = await entityManager
+          .getRepository(BasketEntity)
+          .createQueryBuilder()
+          .update()
+          .set({ count: getBasket.count + iBasket.count })
+          .where('id = :id', { id: iBasket.product.id })
+          .execute();
+
+        if (updateBasket.affected === 0) {
+          return;
+        }
+
+        return Ok(BasketEntity.toIBasketEntity(getBasket));
+      },
+    );
+
+    return res;
+  }
+
+  @HandleError
+  async getBasketByUserId(userId: string): Promise<Result<IBasketEntity[]>> {
+    const res = await this.basketRepository
+      .createQueryBuilder('b')
+      .leftJoinAndSelect('b.product', 'p')
+      .where('b.userId = :userId', { userId: userId })
+      .getMany();
+
+    return Ok(res.map((x) => BasketEntity.toIBasketEntity(x)));
   }
 }

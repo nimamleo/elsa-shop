@@ -11,6 +11,7 @@ import { IPaginatedResult } from '@common/pagination/paginated-result.interface'
 import { PaginationResult } from '@common/pagination/paginatio-result';
 import { ILimitation } from '@common/pagination/limitation.interface';
 import { GetProductList } from './dto/get-product-list.dto';
+import { IBasket, IBasketEntity } from '../models/basket.model';
 
 @Injectable()
 export class ProductService {
@@ -70,6 +71,16 @@ export class ProductService {
   @HandleError
   async deleteProduct(id: string): Promise<Result<boolean>> {
     const res = await this.productDatabaseProvider.deleteProduct(id);
+    if (res.isError()) {
+      return Err(res.err);
+    }
+
+    return Ok(res.value);
+  }
+
+  @HandleError
+  async getUserBasket(userId: string): Promise<Result<IBasketEntity[]>> {
+    const res = await this.productDatabaseProvider.getBasketByUserId(userId);
     if (res.isError()) {
       return Err(res.err);
     }
