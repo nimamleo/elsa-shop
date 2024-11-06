@@ -1,22 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsPhoneNumber } from 'class-validator';
 
-export class LoginRequest {
+export class AuthSendCodeRequest {
   @ApiProperty()
   @IsNotEmpty()
   @IsPhoneNumber('IR')
   phone: string;
 }
-export class LoginResponse {
-  @ApiProperty()
-  id: string;
-
+export class AuthSendCodeResponse {
   @ApiProperty()
   phone: string;
 
   @ApiProperty()
-  accessToken: string;
+  code: number;
 
   @ApiProperty()
-  refreshToken: string;
+  ttl: number;
 }

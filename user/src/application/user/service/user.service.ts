@@ -14,6 +14,7 @@ export class UserService {
     private readonly userProvider: IUserProvider,
   ) {}
 
+  @HandleError
   async getUserByPhone(phone: string): Promise<Result<IUserEntity>> {
     const getUser = await this.userProvider.getUserByPhone(phone);
     if (getUser.isError()) {
@@ -22,6 +23,7 @@ export class UserService {
     return Ok(getUser.value);
   }
 
+  @HandleError
   async createUser(iUser: IUser): Promise<Result<IUserEntity>> {
     const createUser = await this.userProvider.createUser({
       phone: iUser.phone,

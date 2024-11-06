@@ -17,15 +17,24 @@ import { LoginRequest, LoginResponse } from './model/login.model';
 import { AuthService } from '@auth/application/auth/services/auth.service';
 import { AuthGuard } from '../../guard/auth.guard';
 import { GetUserId } from '../../decorators/get-user-id.decorator';
+import {
+  AuthSendCodeRequest,
+  AuthSendCodeResponse,
+} from './model/auth-send-code.model';
+import { APP_CONFIG_TOKEN, IAppConfig } from '../../../../app.config';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthHttpController extends AbstractHttpController {
+  private readonly appConfig: IAppConfig;
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    configService: ConfigService,
   ) {
     super();
+    this.appConfig = configService.get(APP_CONFIG_TOKEN);
   }
 
   @Post('verify')
@@ -61,10 +70,34 @@ export class AuthHttpController extends AbstractHttpController {
     );
   }
 
-  @Get()
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
-  async test(@Res() response: Response, @GetUserId() userId: string) {
-    this.sendResult(response, Ok(userId));
+  @Post('auth/sendCode')
+  async sendCode(@Res() response: Response, @Body() body: AuthSendCodeRequest) {
+    const user = await this.userService.getUserByPhone(body.phone);
+    if (user.isError()) {
+      this.sendResult(response, user);
+      return;
+    }
+
+    const generateCode = await this.authService.generateCode(body.phone);
+    if (generateCode.isError()) {
+      this.sendResult(response, generateCode);
+      return;
+    }
+
+    if (!this.appConfig.debug) {
+      //add event in RABBITMQ QUEUE
+    }
+
+    this.sendResult(
+      response,
+      Ok<AuthSendCodeResponse>({
+        code: generateCode.value.code,
+        ttl: generateCode.value.ttl,
+        phone: body.phone,
+      }),
+    );
   }
+
+  @Post('auth/VerifyCode')
+  async verifyCode(@Res() response: Response) {}
 }
