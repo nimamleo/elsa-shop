@@ -8,9 +8,10 @@ import { RedisService } from './service/redis.service';
   providers: [
     {
       provide: REDIS_DB0_PROVIDER,
+      inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
         const client = new RedisService(0, configService);
-        await client.connect();
+        // await client.connect();
         return client;
       },
     },

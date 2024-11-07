@@ -11,7 +11,6 @@ import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AbstractHttpController } from '@common/http/abstract-http.controller';
 import { Err, Ok } from '@common/result';
 import { UserService } from '@user/application/user/service/user.service';
-import { LoginRequest, LoginResponse } from './model/login.model';
 import { AuthService } from '@auth/application/auth/services/auth.service';
 import {
   AuthSendCodeRequest,
@@ -43,12 +42,6 @@ export class AuthHttpController extends AbstractHttpController {
   @ApiResponse({ type: AuthSendCodeResponse })
   @ApiBody({ type: AuthSendCodeRequest })
   async sendCode(@Res() response: Response, @Body() body: AuthSendCodeRequest) {
-    const user = await this.userService.getUserByPhone(body.phone);
-    if (user.isError()) {
-      this.sendResult(response, user);
-      return;
-    }
-
     const generateCode = await this.authService.generateCode(body.phone);
     if (generateCode.isError()) {
       this.sendResult(response, generateCode);

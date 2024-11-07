@@ -4,10 +4,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JWT_CONFIG_TOKEN, IJwtConfig } from './config/jwtConfig';
 import { AuthService } from './services/auth.service';
+import { CacheModule } from './cache/cache.module';
 
 @Module({
   imports: [
     DatabaseModule,
+    CacheModule,
+    ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

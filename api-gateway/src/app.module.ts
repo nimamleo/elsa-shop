@@ -6,12 +6,22 @@ import { pgsqlConfig } from '@infrastructure/infrastructure/database/pgsql/confi
 import { jwtConfig } from '@auth/application/auth/config/jwtConfig';
 import { parspackConfig } from '@infrastructure/infrastructure/asset/config/parspack.config';
 import { appConfig } from './app.config';
+import { redisConfig } from '@infrastructure/infrastructure/redis/config/redis.config';
+import { authConfig } from '@auth/application/auth/config/auth.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       cache: true,
-      load: [httpConfig, pgsqlConfig, jwtConfig, parspackConfig, appConfig],
+      load: [
+        httpConfig,
+        pgsqlConfig,
+        jwtConfig,
+        parspackConfig,
+        appConfig,
+        redisConfig,
+        authConfig,
+      ],
     }),
     IoModule,
   ],

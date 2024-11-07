@@ -13,6 +13,8 @@ export class RedisService implements IRedisProvider {
     this.redisConfig = configService.get(REDIS_CONFIG_TOKEN);
     this.redisClient = new Redis({
       db: index,
+      port: this.redisConfig.port,
+      username: this.redisConfig.username,
       host: this.redisConfig.host,
       password: this.redisConfig.password,
     });
