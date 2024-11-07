@@ -123,4 +123,14 @@ export class AuthService {
       ttl: getCodeTtl.value,
     });
   }
+
+  @HandleError
+  async verifyCode(code: number, phone: string): Promise<Result<boolean>> {
+    const getCode = await this.cacheService.getCode(phone);
+    if (getCode.isError()) {
+      return Err(getCode.err);
+    }
+
+    return Ok(true);
+  }
 }

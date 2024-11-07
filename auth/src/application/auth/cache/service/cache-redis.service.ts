@@ -44,7 +44,7 @@ export class CacheRedisService implements ICacheProvider {
       .get(`${this.CACHE_CODE_PREFIX}-${phone}`);
 
     if (!res) {
-      return Err('code not found', GenericStatusCodes.NOT_FOUND);
+      return Err('code not not found', GenericStatusCodes.NOT_FOUND);
     }
 
     return Ok(JSON.parse(res));
