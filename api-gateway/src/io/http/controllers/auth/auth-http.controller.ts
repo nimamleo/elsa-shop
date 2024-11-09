@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Inject,
   Post,
   Res,
   UsePipes,
@@ -23,6 +24,11 @@ import {
   AuthVerifyCodeResponse,
 } from './model/auth-verify-code.model';
 import { GenericStatusCodes } from '@common/enums/status.enum';
+import {
+  ISendSmsWriter,
+  SEND_SMS_WRITER,
+} from '../../../../infrastrucutre/coomand-clinet/provider/send-sms.provider';
+import { RandomNumber } from '@common/utils/random-number';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -31,6 +37,8 @@ export class AuthHttpController extends AbstractHttpController {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    @Inject(SEND_SMS_WRITER)
+    private readonly smsWriter: ISendSmsWriter,
     configService: ConfigService,
   ) {
     super();
@@ -42,21 +50,40 @@ export class AuthHttpController extends AbstractHttpController {
   @ApiResponse({ type: AuthSendCodeResponse })
   @ApiBody({ type: AuthSendCodeRequest })
   async sendCode(@Res() response: Response, @Body() body: AuthSendCodeRequest) {
-    const generateCode = await this.authService.generateCode(body.phone);
-    if (generateCode.isError()) {
-      this.sendResult(response, generateCode);
-      return;
-    }
+    const getCode = await this.authService.getCode(body.phone);
+    if (getCode.isError()) {
+      if (getCode.err._code === GenericStatusCodes.NOT_FOUND) {
+        let code: number = 12654;
+        if (!this.appConfig.debug) {
+          code = RandomNumber(5);
+        }
+        await this.authService.cacheCode(body.phone, code);
 
-    if (!this.appConfig.debug) {
-      //add event in RABBITMQ QUEUE
+        if (!this.appConfig.debug) {
+          await this.smsWriter.sendSms({
+            phone: body.phone,
+            message: `${code}`,
+          });
+        }
+        this.sendResult(
+          response,
+          Ok<AuthSendCodeResponse>({
+            code: code,
+            ttl: 120,
+            phone: body.phone,
+          }),
+        );
+        return;
+      }
+      this.sendResult(response, getCode);
+      return;
     }
 
     this.sendResult(
       response,
       Ok<AuthSendCodeResponse>({
-        code: generateCode.value.code,
-        ttl: generateCode.value.ttl,
+        code: getCode.value.code,
+        ttl: getCode.value.ttl,
         phone: body.phone,
       }),
     );

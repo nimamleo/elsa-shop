@@ -11,6 +11,7 @@ import { PaymentModule } from '@payment/application/payment/payment.module';
 import { AssetModule } from '@asset/application/asset/asset.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserHttpController } from './http/controllers/user/user-http.controller';
+import { CommandClientModule } from '../infrastrucutre/coomand-clinet/command-client.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { UserHttpController } from './http/controllers/user/user-http.controller
     PaymentModule,
     AssetModule,
     ConfigModule,
+    CommandClientModule,
   ],
   controllers: [
     AuthHttpController,

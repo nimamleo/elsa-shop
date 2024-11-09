@@ -5,7 +5,8 @@
   "author": "",
   "private": true,
   "workspaces": [
-    "api-gateway"
+    "api-gateway",
+    "rabbitmq-gateway"
   ],
   "license": "UNLICENSED",
   "scripts": {

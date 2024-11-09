@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "types": [
+      "node",
+      "jest"
+    ],
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "lib": [
+      "es2021"
+    ],
+    "paths": {
+      "@common/*": ["../common/*"],
+      "@infrastructure/*": ["../infrastructure/src/*"],
+      "@user/*": ["../user/src/*"],
+      "@product/*": ["../product/src/*"],
+      "@comment/*": ["../comment/src/*"],
+      "@payment/*": ["../payment/src/*"],
+      "@asset/*": ["../asset/src/*"],
+      "@auth/*": ["../auth/src/*"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "../infrastructure/**/migrations/**/*.ts",
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

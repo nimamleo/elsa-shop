@@ -21,7 +21,7 @@ export const appConfig = registerAs<IAppConfig, ConfigFactory<IAppConfig>>(
 
     return {
       baseUrl: process.env.APP_BASE_URL,
-      debug: Boolean(process.env.APP_DEBUG),
+      debug: process.env.APP_DEBUG === 'true',
     };
   },
 );

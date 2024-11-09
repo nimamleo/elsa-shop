@@ -23,17 +23,13 @@ import { AUTH_CONFIG_TOKEN, IAuthConfig } from '../config/auth.config';
 
 @Injectable()
 export class AuthService {
-  private readonly authConfig: IAuthConfig;
   constructor(
     @Inject(AUTH_DATABASE_PROVIDER)
     private readonly authDatabaseProvider: IAuthDatabaseProvider,
     private readonly jwtService: JwtService,
     @Inject(CACHE_CODE_PROVIDER)
     private readonly cacheService: ICacheProvider,
-    configService: ConfigService,
-  ) {
-    this.authConfig = configService.get(AUTH_CONFIG_TOKEN);
-  }
+  ) {}
 
   @HandleError
   async verifyAuth(userId: string): Promise<Result<IAuthEntity>> {
@@ -99,20 +95,12 @@ export class AuthService {
   }
 
   @HandleError
-  async generateCode(phone: string): Promise<Result<GenerateCodeDto>> {
-    let code: number = 12654;
-    if (!this.authConfig.debug) {
-      code = RandomNumber(5);
-    }
-
+  async getCode(phone: string): Promise<Result<GenerateCodeDto>> {
     const getCode = await this.cacheService.getCode(phone);
     if (getCode.isError()) {
-      const cacheCode = await this.cacheService.setCode(phone, code, 120);
-      if (cacheCode.isError()) {
-        return Err(cacheCode.err);
-      }
-      return Ok({ code: code, ttl: 120 });
+      return Err(getCode.err);
     }
+
     const getCodeTtl = await this.cacheService.getTtl(phone);
     if (getCodeTtl.isError()) {
       return Err(getCodeTtl.err);
@@ -122,6 +110,15 @@ export class AuthService {
       code: getCode.value,
       ttl: getCodeTtl.value,
     });
+  }
+
+  async cacheCode(phone: string, code: number): Promise<Result<boolean>> {
+    const cacheCode = await this.cacheService.setCode(phone, code, 120);
+    if (cacheCode.isError()) {
+      return Err(cacheCode.err);
+    }
+
+    return Ok(cacheCode.value);
   }
 
   @HandleError
