@@ -12,4 +12,14 @@ export class SendSmsCreate implements StreamKey {
     return "sms:create";
   }
 }
-export class SendSmsCreated {}
+export class SendSmsCreated {
+  success: boolean;
+
+  constructor(init?: Partial<SendSmsCreated>) {
+    Object.assign(this, init);
+  }
+
+  streamKey(): string {
+    return "sms:created";
+  }
+}
