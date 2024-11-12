@@ -21,7 +21,7 @@ dev-pre-build-job:
     - docker logout $CI_REGISTRY
 
 dev-api-gateway-build-job:
-  stage: dev-pre-build
+  stage: dev-api-gateway-build
   image: docker:24
   only:
     - develop
