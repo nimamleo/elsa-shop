@@ -2,6 +2,7 @@ stages:
   - dev-pre-build
   - dev-gateways-build
   - dev-api-gateway-deploy
+  - dev-rabbitmq-gateway-deploy
 
 
 dev-pre-build-job:
@@ -60,43 +61,24 @@ dev-api-gateway-deploy-job:
     - docker logout $CI_REGISTRY
   tags:
     - tech
+
+dev-rabbitmq-gateway-deploy-job:
+  stage: dev-rabbitmq-gateway-deploy
+  image: docker:24
+  only:
+    - develop
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+  script:
+    - cd docker/rabbitmq-gateway
+    - echo "$SHOP_ENV" > .env
+    - cat .env
+    - docker compose -f docker-compose.dev.yaml pull
+    - docker compose -f docker-compose.dev.yaml down
+    - docker compose -f docker-compose.dev.yaml up -d
+    - docker system prune -a --force
+  after_script:
+    - docker logout $CI_REGISTRY
+  tags:
+    - tech
 #
-#rabbit-dev-build:
-#  stage: rabbit-dev-build
-#  image: docker:24
-#  only:
-#    - develop
-#  services:
-#    - docker:24-dind
-#  variables:
-#    DOCKER_TLS_CERTDIR: "/certs"
-#  before_script:
-#    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-#  script:
-#    - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID -f ./docker/prebuild.dockerfile .
-#    - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
-#    - docker build --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID -f ./docker/rabbitmq-gateway.dockerfile .
-#    - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
-#  after_script:
-#    - docker logout $CI_REGISTRY
-#
-#
-#rabbit-deploy-job:
-#  stage: rabbit-dev-deploy
-#  image: docker:24
-#  only:
-#    - develop
-#  before_script:
-#    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-#  script:
-#    - cd docker/rabbitmq-gateway
-#    - echo "$SHOP_ENV" > .env
-#    - cat .env
-#    - docker compose -f docker-compose.dev.yaml pull
-#    - docker compose -f docker-compose.dev.yaml down
-#    - docker compose -f docker-compose.dev.yaml up -d
-#    - docker system prune -a --force
-#  after_script:
-#    - docker logout $CI_REGISTRY
-#  tags:
-#    - tech
