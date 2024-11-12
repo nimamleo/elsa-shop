@@ -1,8 +1,7 @@
-version: "3"
 services:
   rabbit-mq-gateway:
     image: registry.gitlab.com/tech7684941/shop:${CI_PIPELINE_ID}
-    container_name: rabbitmq
+    container_name: rabbitmq-gateway
     restart: always
     env_file:
       - ./.env

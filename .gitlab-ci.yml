@@ -1,8 +1,8 @@
 stages:
   - api-dev-build
   - api-dev-deploy
-  - release
-  - prod
+  - rabbit-dev-build
+  - rabbit-dev-deploy
 
 
 dev-build-job:
@@ -36,6 +36,42 @@ dev-deploy-job:
     - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
   script:
     - cd docker/api-gateway
+    - echo "$SHOP_ENV" > .env
+    - cat .env
+    - docker compose -f docker-compose.dev.yaml pull
+    - docker compose -f docker-compose.dev.yaml down
+    - docker compose -f docker-compose.dev.yaml up -d
+    - docker system prune -a --force
+  after_script:
+    - docker logout $CI_REGISTRY
+  tags:
+    - tech
+
+rabbit-dev-build:
+  stage: rabbit-dev-build
+  image: docker:24
+  only:
+    - develop
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID -f ./docker/prebuild.dockerfile .
+    - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
+    - docker build --build-arg CI_PIPELINE_ID=$CI_PIPELINE_ID -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID -f ./docker/rabbit-gateway.dockerfile .
+    - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_ID
+  after_script:
+    - docker logout $CI_REGISTRY
+
+
+rabbit-deploy-job:
+  stage: rabbit-dev-deploy
+  image: docker:24
+  only:
+    - develop
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+  script:
+    - cd docker/rabbitmq-gateway
     - echo "$SHOP_ENV" > .env
     - cat .env
     - docker compose -f docker-compose.dev.yaml pull
