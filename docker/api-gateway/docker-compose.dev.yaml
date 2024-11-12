@@ -4,6 +4,7 @@ services:
     networks:
       - web
       - db-back
+      - cache-back
     env_file:
       - ./.env
     labels:
@@ -20,4 +21,6 @@ networks:
   web:
     external: true
   db-back:
+    external: true
+  cache-back:
     external: true
