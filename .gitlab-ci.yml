@@ -1,6 +1,7 @@
 stages:
   - dev-pre-build
   - dev-gateways-build
+  - dev-api-gateway-deploy
 
 
 dev-pre-build-job:
@@ -40,25 +41,25 @@ dev-gateways-build-job:
     - docker logout $CI_REGISTRY
 
 
-#dev-deploy-job:
-#  stage: api-dev-deploy
-#  image: docker:24
-#  only:
-#    - develop
-#  before_script:
-#    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-#  script:
-#    - cd docker/api-gateway
-#    - echo "$SHOP_ENV" > .env
-#    - cat .env
-#    - docker compose -f docker-compose.dev.yaml pull
-#    - docker compose -f docker-compose.dev.yaml down
-#    - docker compose -f docker-compose.dev.yaml up -d
-#    - docker system prune -a --force
-#  after_script:
-#    - docker logout $CI_REGISTRY
-#  tags:
-#    - tech
+dev-api-gateway-deploy-job:
+  stage: dev-api-gateway-deploy
+  image: docker:24
+  only:
+    - develop
+  before_script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+  script:
+    - echo "$SHOP_ENV" > .env
+    - cat .env
+    - cd docker/api-gateway
+    - docker compose -f docker-compose.dev.yaml pull
+    - docker compose -f docker-compose.dev.yaml down
+    - docker compose -f docker-compose.dev.yaml up -d
+    - docker system prune -a --force
+  after_script:
+    - docker logout $CI_REGISTRY
+  tags:
+    - tech
 #
 #rabbit-dev-build:
 #  stage: rabbit-dev-build
