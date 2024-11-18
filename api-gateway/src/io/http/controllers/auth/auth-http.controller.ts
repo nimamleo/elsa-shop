@@ -112,6 +112,16 @@ export class AuthHttpController extends AbstractHttpController {
       this.sendResult(response, verifyCode);
       return;
     }
+    if (!verifyCode.value) {
+      this.sendResult(
+        response,
+        Err(
+          'code is not valid anymore or has expired',
+          GenericStatusCodes.NOT_FOUND,
+        ),
+      );
+      return;
+    }
 
     let user = await this.userService.getUserByPhone(body.phone);
     if (user.isError()) {

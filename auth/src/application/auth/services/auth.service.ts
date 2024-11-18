@@ -128,6 +128,6 @@ export class AuthService {
       return Err(getCode.err);
     }
 
-    return Ok(true);
+    return Ok(code === getCode.value);
   }
 }
