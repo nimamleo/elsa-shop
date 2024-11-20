@@ -12,6 +12,8 @@ import { PaginationResult } from '@common/pagination/paginatio-result';
 import { ILimitation } from '@common/pagination/limitation.interface';
 import { GetProductList } from './dto/get-product-list.dto';
 import { IBasket, IBasketEntity } from '../models/basket.model';
+import { IColor, IColorEntity } from '../models/color.model';
+import { ISize, ISizeEntity } from '../models/size.model';
 
 @Injectable()
 export class ProductService {
@@ -29,6 +31,24 @@ export class ProductService {
     }
 
     return Ok(createProduct.value);
+  }
+
+  @HandleError
+  async createColor(iColor: IColor): Promise<Result<IColorEntity>> {
+    const res = await this.productDatabaseProvider.createColor(iColor);
+    if (res.isError()) {
+      return Err(res.err);
+    }
+    return Ok(res.value);
+  }
+
+  @HandleError
+  async createSize(iSize: ISize): Promise<Result<ISizeEntity>> {
+    const res = await this.productDatabaseProvider.createSize(iSize);
+    if (res.isError()) {
+      return Err(res.err);
+    }
+    return Ok(res.value);
   }
 
   @HandleError

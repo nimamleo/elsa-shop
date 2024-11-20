@@ -3,6 +3,8 @@ import { Result } from '@common/result';
 import { ICategory, ICategoryEntity } from '../../models/category.model';
 import { GetProductList } from '../pgsql/service/dto/get-product-list.dto';
 import { IBasket, IBasketEntity } from '../../models/basket.model';
+import { IColor, IColorEntity } from '../../models/color.model';
+import { ISize, ISizeEntity } from '../../models/size.model';
 
 export interface IProductReader {
   getCategoryList(): Promise<Result<ICategoryEntity[]>>;
@@ -22,6 +24,10 @@ export interface IProductReader {
 }
 export interface IProductWriter {
   createProduct(iProduct: IProduct): Promise<Result<IProductEntity>>;
+
+  createColor(iColor: IColor): Promise<Result<IColorEntity>>;
+
+  createSize(iSize: ISize): Promise<Result<ISizeEntity>>;
 
   createCategory(iCategory: ICategory): Promise<Result<ICategoryEntity>>;
 

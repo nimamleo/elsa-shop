@@ -59,6 +59,14 @@ import { GenericStatusCodes } from '@common/enums/status.enum';
 import { Multer } from 'multer';
 import { APP_CONFIG_TOKEN, IAppConfig } from '../../../../app.config';
 import { ConfigService } from '@nestjs/config';
+import {
+  CreateColorRequest,
+  CreateColorResponse,
+} from './model/create-color.model';
+import {
+  CreateSizeRequest,
+  CreateSizeResponse,
+} from './model/create-size.model';
 
 @Controller('dashboard')
 @UseGuards(AuthGuard, RBACGuard)
@@ -78,167 +86,220 @@ export class DashboardHttpController extends AbstractHttpController {
     this.appConfig = configService.get(APP_CONFIG_TOKEN);
   }
 
-  @Post('product')
+  @Post('color')
   @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
-  @ApiResponse({ type: CreateProductResponse })
-  @ApiBody({ type: CreateProductRequest })
-  async createProduct(
+  @ApiResponse({ type: CreateColorResponse })
+  @ApiBody({ type: CreateColorRequest })
+  async createColor(
     @Res() response: Response,
-    @Body() body: CreateProductRequest,
+    @Body() body: CreateColorRequest,
   ) {
-    const createProduct = await this.productService.createProduct({
+    const res = await this.productService.createColor({
+      hex: body.hex,
       title: body.title,
-      description: body.description,
-      price: body.price,
-      country: body.country,
-      quality: body.quality,
-      category: { id: body.categoryId },
-      info: body.info.map((x) => ({
-        color: x.color,
-        size: x.size,
-        count: x.count,
-      })),
+      info: [],
     });
-    if (createProduct.isError()) {
-      this.sendResult(response, createProduct);
+    if (res.isError()) {
+      this.sendResult(response, res);
       return;
     }
 
     this.sendResult(
       response,
-      Ok<CreateProductResponse>({
-        id: createProduct.value.id,
-        title: createProduct.value.title,
-        description: createProduct.value.description,
-        price: createProduct.value.price,
-        country: createProduct.value.country,
-        quality: createProduct.value.quality,
-        category: { id: createProduct.value.category.id },
-        info: createProduct.value.info.map((x) => ({
-          size: x.size,
-          color: x.color,
-          count: x.count,
-        })),
-        createdAt: createProduct.value.createdAt.toISOString(),
+      Ok<CreateColorResponse>({
+        id: res.value.id,
+        hex: res.value.hex,
+        title: res.value.title,
+        createdAt: res.value.createdAt.toISOString(),
       }),
     );
   }
 
-  @Get('products')
-  async getProductList(
-    @Res() response: Response,
-    @Query() query: GetProductQuery,
-  ) {
-    const pagination = new Pagination(1);
-
-    let productIds: string[] = [];
-    if (query.orderBy == GetProductBy.SCORE) {
-      const commentProductIdsRes =
-        await this.commentService.getCommentProductIds(
-          query.orderType,
-          CommentOrderBy.SCORE,
-          {
-            skip: pagination.getSkip(),
-            limit: pagination.getLimit(),
-          },
-        );
-      if (commentProductIdsRes.isError()) {
-        this.sendResult(response, commentProductIdsRes);
-        return;
-      }
-
-      productIds = commentProductIdsRes.value.list;
-    } else if (query.orderBy == GetProductBy.SALE) {
-      const paymentProductIdsRes =
-        await this.paymentService.getPaymentProductIds(
-          {
-            skip: pagination.getSkip(),
-            limit: pagination.getLimit(),
-          },
-          query.orderType,
-          PaymentOrderBy.SALE,
-        );
-
-      if (paymentProductIdsRes.isError()) {
-        this.sendResult(response, paymentProductIdsRes);
-        return;
-      }
-      productIds = paymentProductIdsRes.value.list;
-    }
-
-    const productListRes = await this.productService.getProductList({
-      limitation: {
-        skip: 0,
-        limit: productIds.length,
-      },
-      productIds: productIds,
-      orderType: query.orderType,
-      orderBy:
-        query.orderBy == GetProductBy.CREATED_AT
-          ? ProductOrderBy.CREATED_AT
-          : ProductOrderBy.PRICE,
+  @Post('size')
+  @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiResponse({ type: CreateSizeResponse })
+  @ApiBody({ type: CreateSizeRequest })
+  async createSize(@Res() response: Response, @Body() body: CreateSizeRequest) {
+    const res = await this.productService.createSize({
+      title: body.title,
+      info: [],
     });
-    if (productListRes.isError()) {
-      this.sendResult(response, productListRes);
+    if (res.isError()) {
+      this.sendResult(response, res);
       return;
-    }
-
-    const assetList = await this.assetService.getAssetList(
-      productListRes.value.list.map((x) => x.id),
-      {
-        limit: productIds.length,
-        skip: 0,
-      },
-    );
-    if (assetList.isError()) {
-      this.sendResult(response, assetList);
-      return;
-    }
-
-    let result: IProductEntity[] = [];
-    for (const x of productIds) {
-      const product = productListRes.value.list.find(
-        (product) => product.id == x,
-      );
-      if (product) {
-        result.push(product);
-      }
-    }
-    if (result.length == 0) {
-      result = productListRes.value.list;
     }
 
     this.sendResult(
       response,
-      Ok<IPaginatedResult<GetProductResponse>>({
-        list: result.map((x) => {
-          const res: GetProductResponse = {
-            id: x.id,
-            title: x.title,
-            description: x.description,
-            price: x.price,
-            country: x.country,
-            quality: x.quality,
-            info: x.info.map((i) => ({
-              size: i.size,
-              color: i.color,
-              count: i.count,
-            })),
-            images: assetList.value.list
-              .filter((i) => i.targetId == x.id)
-              .map((i) => `${this.appConfig.baseUrl}/${i.directoryPath}`),
-            createdAt: x.createdAt.toISOString(),
-            category: { id: x.category.id },
-          };
-
-          return res;
-        }),
-        total: productListRes.value.total,
-        page: productListRes.value.page,
-        pageSize: productListRes.value.pageSize,
+      Ok<CreateSizeResponse>({
+        id: res.value.id,
+        title: res.value.title,
+        createdAt: res.value.createdAt.toISOString(),
       }),
     );
   }
+
+  // @Post('product')
+  // @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
+  // @ApiResponse({ type: CreateProductResponse })
+  // @ApiBody({ type: CreateProductRequest })
+  // async createProduct(
+  //   @Res() response: Response,
+  //   @Body() body: CreateProductRequest,
+  // ) {
+  //   const createProduct = await this.productService.createProduct({
+  //     title: body.title,
+  //     description: body.description,
+  //     price: body.price,
+  //     country: body.country,
+  //     quality: body.quality,
+  //     category: { id: body.categoryId },
+  //     info: body.info.map((x) => ({
+  //       color: x.color,
+  //       size: x.size,
+  //       count: x.count,
+  //     })),
+  //   });
+  //   if (createProduct.isError()) {
+  //     this.sendResult(response, createProduct);
+  //     return;
+  //   }
+  //
+  //   this.sendResult(
+  //     response,
+  //     Ok<CreateProductResponse>({
+  //       id: createProduct.value.id,
+  //       title: createProduct.value.title,
+  //       description: createProduct.value.description,
+  //       price: createProduct.value.price,
+  //       country: createProduct.value.country,
+  //       quality: createProduct.value.quality,
+  //       category: { id: createProduct.value.category.id },
+  //       info: createProduct.value.info.map((x) => ({
+  //         size: x.size,
+  //         color: x.color,
+  //         count: x.count,
+  //       })),
+  //       createdAt: createProduct.value.createdAt.toISOString(),
+  //     }),
+  //   );
+  // }
+
+  // @Get('products')
+  // async getProductList(
+  //   @Res() response: Response,
+  //   @Query() query: GetProductQuery,
+  // ) {
+  //   const pagination = new Pagination(1);
+  //
+  //   let productIds: string[] = [];
+  //   if (query.orderBy == GetProductBy.SCORE) {
+  //     const commentProductIdsRes =
+  //       await this.commentService.getCommentProductIds(
+  //         query.orderType,
+  //         CommentOrderBy.SCORE,
+  //         {
+  //           skip: pagination.getSkip(),
+  //           limit: pagination.getLimit(),
+  //         },
+  //       );
+  //     if (commentProductIdsRes.isError()) {
+  //       this.sendResult(response, commentProductIdsRes);
+  //       return;
+  //     }
+  //
+  //     productIds = commentProductIdsRes.value.list;
+  //   } else if (query.orderBy == GetProductBy.SALE) {
+  //     const paymentProductIdsRes =
+  //       await this.paymentService.getPaymentProductIds(
+  //         {
+  //           skip: pagination.getSkip(),
+  //           limit: pagination.getLimit(),
+  //         },
+  //         query.orderType,
+  //         PaymentOrderBy.SALE,
+  //       );
+  //
+  //     if (paymentProductIdsRes.isError()) {
+  //       this.sendResult(response, paymentProductIdsRes);
+  //       return;
+  //     }
+  //     productIds = paymentProductIdsRes.value.list;
+  //   }
+  //
+  //   const productListRes = await this.productService.getProductList({
+  //     limitation: {
+  //       skip: 0,
+  //       limit: productIds.length,
+  //     },
+  //     productIds: productIds,
+  //     orderType: query.orderType,
+  //     orderBy:
+  //       query.orderBy == GetProductBy.CREATED_AT
+  //         ? ProductOrderBy.CREATED_AT
+  //         : ProductOrderBy.PRICE,
+  //   });
+  //   if (productListRes.isError()) {
+  //     this.sendResult(response, productListRes);
+  //     return;
+  //   }
+  //
+  //   const assetList = await this.assetService.getAssetList(
+  //     productListRes.value.list.map((x) => x.id),
+  //     {
+  //       limit: productIds.length,
+  //       skip: 0,
+  //     },
+  //   );
+  //   if (assetList.isError()) {
+  //     this.sendResult(response, assetList);
+  //     return;
+  //   }
+  //
+  //   let result: IProductEntity[] = [];
+  //   for (const x of productIds) {
+  //     const product = productListRes.value.list.find(
+  //       (product) => product.id == x,
+  //     );
+  //     if (product) {
+  //       result.push(product);
+  //     }
+  //   }
+  //   if (result.length == 0) {
+  //     result = productListRes.value.list;
+  //   }
+  //
+  //   this.sendResult(
+  //     response,
+  //     Ok<IPaginatedResult<GetProductResponse>>({
+  //       list: result.map((x) => {
+  //         const res: GetProductResponse = {
+  //           id: x.id,
+  //           title: x.title,
+  //           description: x.description,
+  //           price: x.price,
+  //           country: x.country,
+  //           quality: x.quality,
+  //           info: x.info.map((i) => ({
+  //             size: i.size,
+  //             color: i.color,
+  //             count: i.count,
+  //           })),
+  //           images: assetList.value.list
+  //             .filter((i) => i.targetId == x.id)
+  //             .map((i) => `${this.appConfig.baseUrl}/${i.directoryPath}`),
+  //           createdAt: x.createdAt.toISOString(),
+  //           category: { id: x.category.id },
+  //         };
+  //
+  //         return res;
+  //       }),
+  //       total: productListRes.value.total,
+  //       page: productListRes.value.page,
+  //       pageSize: productListRes.value.pageSize,
+  //     }),
+  //   );
+  // }
 
   @Post('category')
   @RBAC(Role.ADMIN, Role.SUPER_ADMIN)

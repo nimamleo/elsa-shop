@@ -12,17 +12,27 @@ import { Size } from '../../../enum/size.enum';
 import { ProductEntity } from './product.entity';
 import { IInfo, IInfoEntity } from '../../../models/info.model';
 import { BasketEntity } from './basket.entity';
+import { SizeEntity } from './size.entity';
+import { ColorEntity } from './color.entity';
 
 @Entity('info')
 export class InfoEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   id: number;
 
-  @Column({ type: 'varchar', length: 255 })
-  color: string;
+  @Column({ type: 'bigint', unsigned: true })
+  colorId: number;
 
-  @Column({ type: 'varchar' })
-  size: Size;
+  @Column({ type: 'bigint', unsigned: true })
+  sizeId: number;
+
+  @ManyToOne(() => SizeEntity, (x) => x.info)
+  @JoinColumn({ name: 'colorId' })
+  color: ColorEntity;
+
+  @ManyToOne(() => SizeEntity, (x) => x.info)
+  @JoinColumn({ name: 'sizeId' })
+  size: SizeEntity;
 
   @Column({ type: 'int' })
   count: number;
@@ -50,9 +60,9 @@ export class InfoEntity {
 
     const info = new InfoEntity();
 
-    info.color = iInfo.color;
+    info.colorId = +iInfo.color.id;
     info.count = iInfo.count;
-    info.size = iInfo.size;
+    info.sizeId = +iInfo.size.id;
     info.productId = Number(iInfo.product.id);
 
     return info;
@@ -64,8 +74,12 @@ export class InfoEntity {
 
     return {
       id: info.id.toString(),
-      size: info.size,
-      color: info.color,
+      size: info.size
+        ? SizeEntity.toISizeEntity(info.size)
+        : { id: info.sizeId.toString() },
+      color: info.color
+        ? ColorEntity.toIColorEntity(info.color)
+        : { id: info.colorId.toString() },
       count: info.count,
       product: info.product
         ? ProductEntity.toIProductEntity(info.product)

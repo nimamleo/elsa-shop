@@ -33,40 +33,40 @@ export class UserHttpController extends AbstractHttpController {
     super();
   }
 
-  @Get('basket')
-  @ApiResponse({ type: CreateProductResponse })
-  async getUserBasket(@Res() response: Response, @GetUserId() userId: string) {
-    const res = await this.productService.getUserBasket(userId);
-    if (res.isError()) {
-      this.sendResult(response, res);
-      return;
-    }
-
-    let totalPrice = 0;
-    for (const x of res.value) {
-      totalPrice = totalPrice + x.product.price * x.count;
-    }
-
-    this.sendResult(
-      response,
-      Ok<GetUserBasketResponse>({
-        price: totalPrice,
-        taxPrice: Math.floor(totalPrice * 0.1),
-        totalPrice: Math.floor(totalPrice * 1.1),
-        list: res.value.map((x) => ({
-          count: x.count,
-          size: x.info.size,
-          color: x.info.color,
-          country: x.product.country,
-          price: x.product.price,
-          id: x.id,
-          image: null,
-          quality: x.product.quality,
-          title: x.product.title,
-        })),
-      }),
-    );
-  }
+  // @Get('basket')
+  // @ApiResponse({ type: CreateProductResponse })
+  // async getUserBasket(@Res() response: Response, @GetUserId() userId: string) {
+  //   const res = await this.productService.getUserBasket(userId);
+  //   if (res.isError()) {
+  //     this.sendResult(response, res);
+  //     return;
+  //   }
+  //
+  //   let totalPrice = 0;
+  //   for (const x of res.value) {
+  //     totalPrice = totalPrice + x.product.price * x.count;
+  //   }
+  //
+  //   this.sendResult(
+  //     response,
+  //     Ok<GetUserBasketResponse>({
+  //       price: totalPrice,
+  //       taxPrice: Math.floor(totalPrice * 0.1),
+  //       totalPrice: Math.floor(totalPrice * 1.1),
+  //       list: res.value.map((x) => ({
+  //         count: x.count,
+  //         size: x.info.size,
+  //         color: x.info.color,
+  //         country: x.product.country,
+  //         price: x.product.price,
+  //         id: x.id,
+  //         image: null,
+  //         quality: x.product.quality,
+  //         title: x.product.title,
+  //       })),
+  //     }),
+  //   );
+  // }
 
   @Post('basket')
   async addToBasket(

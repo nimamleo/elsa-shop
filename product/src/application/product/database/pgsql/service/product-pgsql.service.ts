@@ -14,6 +14,10 @@ import { ProductOrderBy } from '../../../enum/product-order-by.enum';
 import { IBasket, IBasketEntity } from '../../../models/basket.model';
 import { BasketEntity } from '../entities/basket.entity';
 import { GenericStatusCodes } from '@common/enums/status.enum';
+import { IColor, IColorEntity } from '../../../models/color.model';
+import { ISize, ISizeEntity } from '../../../models/size.model';
+import { ColorEntity } from '../entities/color.entity';
+import { SizeEntity } from '../entities/size.entity';
 
 @Injectable()
 export class ProductPgsqlService implements IProductDatabaseProvider {
@@ -24,6 +28,10 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
     private readonly categoryRepository: Repository<CategoryEntity>,
     @InjectRepository(InfoEntity)
     private readonly infoRepository: Repository<InfoEntity>,
+    @InjectRepository(ColorEntity)
+    private readonly colorRepository: Repository<ColorEntity>,
+    @InjectRepository(SizeEntity)
+    private readonly sizeRepository: Repository<SizeEntity>,
     @InjectRepository(BasketEntity)
     private readonly basketRepository: Repository<BasketEntity>,
     @InjectDataSource()
@@ -66,6 +74,26 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
     }
 
     return Ok(CategoryEntity.toICategoryEntity(res));
+  }
+
+  @HandleError
+  async createColor(iColor: IColor): Promise<Result<IColorEntity>> {
+    const res = await this.colorRepository.save(ColorEntity.fromIColor(iColor));
+    if (!res) {
+      return Err('some thing went wrong');
+    }
+
+    return Ok(ColorEntity.toIColorEntity(res));
+  }
+
+  @HandleError
+  async createSize(iSize: ISize): Promise<Result<ISizeEntity>> {
+    const res = await this.sizeRepository.save(SizeEntity.fromISize(iSize));
+    if (!res) {
+      return Err('some thing went wrong');
+    }
+
+    return Ok(SizeEntity.toISizeEntity(res));
   }
 
   @HandleError

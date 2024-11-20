@@ -1,12 +1,13 @@
 import { IEntity } from '@common/interfaces/entity.interface';
 import { IDated } from '@common/interfaces/dated.interface';
-import { Size } from '../enum/size.enum';
 import { IProductEntity } from './product.model';
 import { IBasketEntity } from './basket.model';
+import { ISizeEntity } from './size.model';
+import { IColorEntity } from './color.model';
 
 export interface IInfo {
-  color: string;
-  size: Size;
+  color: Partial<IColorEntity>;
+  size: Partial<ISizeEntity>;
   count: number;
   product: Partial<IProductEntity>;
   basket?: Partial<IBasketEntity>[];
