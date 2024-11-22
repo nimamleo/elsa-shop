@@ -231,4 +231,16 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
 
     return Ok(ProductEntity.toIProductEntity(res));
   }
+
+  @HandleError
+  async getSizeList(): Promise<Result<ISizeEntity[]>> {
+    const res = await this.sizeRepository.createQueryBuilder().getMany();
+    return Ok(res.map((x) => SizeEntity.toISizeEntity(x)));
+  }
+
+  @HandleError
+  async getColorList(): Promise<Result<IColorEntity[]>> {
+    const res = await this.colorRepository.createQueryBuilder().getMany();
+    return Ok(res.map((x) => ColorEntity.toIColorEntity(x)));
+  }
 }

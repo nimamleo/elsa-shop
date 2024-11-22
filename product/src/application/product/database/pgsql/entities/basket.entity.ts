@@ -32,7 +32,7 @@ export class BasketEntity {
   productInfoId: number;
 
   @ManyToOne(() => InfoEntity, (x) => x.basket)
-  @JoinColumn({ name: 'infoId' })
+  @JoinColumn({ name: 'productInfoId' })
   productInfo: InfoEntity;
 
   @Column({ type: 'int' })

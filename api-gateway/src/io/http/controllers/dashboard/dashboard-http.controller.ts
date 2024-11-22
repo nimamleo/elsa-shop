@@ -67,6 +67,8 @@ import {
   CreateSizeRequest,
   CreateSizeResponse,
 } from './model/create-size.model';
+import { GetColorListResponse } from './model/get-color-list.model';
+import { GetSizeListResponse } from './model/get-size-list.model';
 
 @Controller('dashboard')
 @UseGuards(AuthGuard, RBACGuard)
@@ -414,6 +416,45 @@ export class DashboardHttpController extends AbstractHttpController {
           mimetype: x.mimetype,
           directoryPath: x.directoryPath,
           isPoster: x.isPoster,
+        })),
+      }),
+    );
+  }
+
+  @Get('color')
+  async getColorList(@Res() response: Response) {
+    const res = await this.productService.getColorList();
+    if (res.isError()) {
+      this.sendResult(response, res);
+    }
+
+    this.sendResult(
+      response,
+      Ok<GetColorListResponse>({
+        list: res.value.map((x) => ({
+          id: x.id,
+          title: x.title,
+          hex: x.hex,
+          createdAt: x.createdAt.toISOString(),
+        })),
+      }),
+    );
+  }
+
+  @Get('size')
+  async getSizeList(@Res() response: Response) {
+    const res = await this.productService.getSizeList();
+    if (res.isError()) {
+      this.sendResult(response, res);
+    }
+
+    this.sendResult(
+      response,
+      Ok<GetSizeListResponse>({
+        list: res.value.map((x) => ({
+          id: x.id,
+          title: x.title,
+          createdAt: x.createdAt.toISOString(),
         })),
       }),
     );

@@ -29,6 +29,7 @@ import {
   SEND_SMS_WRITER,
 } from '../../../../infrastrucutre/coomand-clinet/provider/send-sms.provider';
 import { RandomNumber } from '@common/utils/random-number';
+import { Role } from '@user/application/user/enum/role.enum';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -127,6 +128,7 @@ export class AuthHttpController extends AbstractHttpController {
     if (user.isError()) {
       user = await this.userService.createUser({
         phone: body.phone,
+        role: Role.USER,
       });
       if (user.isError()) {
         this.sendResult(response, user);

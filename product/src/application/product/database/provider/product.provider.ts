@@ -21,6 +21,10 @@ export interface IProductReader {
   getBasketByUserId(userId: string): Promise<Result<IBasketEntity[]>>;
 
   getProductById(id: string): Promise<Result<IProductEntity>>;
+
+  getColorList(): Promise<Result<IColorEntity[]>>;
+
+  getSizeList(): Promise<Result<ISizeEntity[]>>;
 }
 export interface IProductWriter {
   createProduct(iProduct: IProduct): Promise<Result<IProductEntity>>;

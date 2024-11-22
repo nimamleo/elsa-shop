@@ -132,4 +132,24 @@ export class ProductService {
 
     return Ok(res.value);
   }
+
+  @HandleError
+  async getSizeList(): Promise<Result<ISizeEntity[]>> {
+    const res = await this.productDatabaseProvider.getSizeList();
+    if (res.isError()) {
+      return Err(res.err);
+    }
+
+    return Ok(res.value);
+  }
+
+  @HandleError
+  async getColorList(): Promise<Result<IColorEntity[]>> {
+    const res = await this.productDatabaseProvider.getColorList();
+    if (res.isError()) {
+      return Err(res.err);
+    }
+
+    return Ok(res.value);
+  }
 }
