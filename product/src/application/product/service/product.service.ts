@@ -14,6 +14,8 @@ import { GetProductList } from './dto/get-product-list.dto';
 import { IBasket, IBasketEntity } from '../models/basket.model';
 import { IColor, IColorEntity } from '../models/color.model';
 import { ISize, ISizeEntity } from '../models/size.model';
+import { IQuality, IQualityEntity } from '../models/quality.model';
+import { ICountry, ICountryEntity } from '../models/country.model';
 
 @Injectable()
 export class ProductService {
@@ -52,6 +54,24 @@ export class ProductService {
   }
 
   @HandleError
+  async createQuality(iQuality: IQuality): Promise<Result<IQualityEntity>> {
+    const res = await this.productDatabaseProvider.createQuality(iQuality);
+    if (res.isError()) {
+      return Err(res.err);
+    }
+    return Ok(res.value);
+  }
+
+  @HandleError
+  async createCountry(iCountry: ICountry): Promise<Result<ICountryEntity>> {
+    const res = await this.productDatabaseProvider.createCountry(iCountry);
+    if (res.isError()) {
+      return Err(res.err);
+    }
+    return Ok(res.value);
+  }
+
+  @HandleError
   async CreateCategory(iCategory: ICategory): Promise<Result<ICategoryEntity>> {
     const res = await this.productDatabaseProvider.createCategory(iCategory);
     if (res.isError()) {
@@ -80,6 +100,9 @@ export class ProductService {
       productIds: dto.productIds,
       orderBy: dto.orderBy,
       orderType: dto.orderType,
+      sizeIds: dto.sizeIds,
+      colorIds: dto.colorIds,
+      price: dto.price,
     });
     if (res.isError()) {
       return Err(res.err);
@@ -146,6 +169,26 @@ export class ProductService {
   @HandleError
   async getColorList(): Promise<Result<IColorEntity[]>> {
     const res = await this.productDatabaseProvider.getColorList();
+    if (res.isError()) {
+      return Err(res.err);
+    }
+
+    return Ok(res.value);
+  }
+
+  @HandleError
+  async getQualityList(): Promise<Result<IQualityEntity[]>> {
+    const res = await this.productDatabaseProvider.getQualityList();
+    if (res.isError()) {
+      return Err(res.err);
+    }
+
+    return Ok(res.value);
+  }
+
+  @HandleError
+  async getCountryList(): Promise<Result<ICountryEntity[]>> {
+    const res = await this.productDatabaseProvider.getCountryList();
     if (res.isError()) {
       return Err(res.err);
     }

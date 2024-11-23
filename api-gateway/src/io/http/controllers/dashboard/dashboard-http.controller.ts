@@ -37,7 +37,7 @@ import {
 import { GetCategoryListResponse } from './model/get-category-list.model';
 import { CommentService } from '@comment/application/comment/service/comment.service';
 import {
-  GetProductQuery,
+  GetProductRequest,
   GetProductResponse,
 } from './model/get-product-list.model';
 import { CommentOrderBy } from '@comment/application/comment/database/enum/comment-order-by.enum';
@@ -69,6 +69,16 @@ import {
 } from './model/create-size.model';
 import { GetColorListResponse } from './model/get-color-list.model';
 import { GetSizeListResponse } from './model/get-size-list.model';
+import {
+  CreateCountryRequest,
+  CreateCountryResponse,
+} from './model/create-country.model';
+import {
+  CreateQualityRequest,
+  CreateQualityResponse,
+} from './model/create-quality.model';
+import { GetCountryListResponse } from './model/get-country-list.model';
+import { GetQualityListResponse } from './model/get-quality-list.model';
 
 @Controller('dashboard')
 @UseGuards(AuthGuard, RBACGuard)
@@ -141,167 +151,224 @@ export class DashboardHttpController extends AbstractHttpController {
     );
   }
 
-  // @Post('product')
-  // @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
-  // @ApiResponse({ type: CreateProductResponse })
-  // @ApiBody({ type: CreateProductRequest })
-  // async createProduct(
-  //   @Res() response: Response,
-  //   @Body() body: CreateProductRequest,
-  // ) {
-  //   const createProduct = await this.productService.createProduct({
-  //     title: body.title,
-  //     description: body.description,
-  //     price: body.price,
-  //     country: body.country,
-  //     quality: body.quality,
-  //     category: { id: body.categoryId },
-  //     info: body.info.map((x) => ({
-  //       color: x.color,
-  //       size: x.size,
-  //       count: x.count,
-  //     })),
-  //   });
-  //   if (createProduct.isError()) {
-  //     this.sendResult(response, createProduct);
-  //     return;
-  //   }
-  //
-  //   this.sendResult(
-  //     response,
-  //     Ok<CreateProductResponse>({
-  //       id: createProduct.value.id,
-  //       title: createProduct.value.title,
-  //       description: createProduct.value.description,
-  //       price: createProduct.value.price,
-  //       country: createProduct.value.country,
-  //       quality: createProduct.value.quality,
-  //       category: { id: createProduct.value.category.id },
-  //       info: createProduct.value.info.map((x) => ({
-  //         size: x.size,
-  //         color: x.color,
-  //         count: x.count,
-  //       })),
-  //       createdAt: createProduct.value.createdAt.toISOString(),
-  //     }),
-  //   );
-  // }
+  @Post('country')
+  @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiResponse({ type: CreateSizeResponse })
+  @ApiBody({ type: CreateSizeRequest })
+  async createCountry(
+    @Res() response: Response,
+    @Body() body: CreateCountryRequest,
+  ) {
+    const res = await this.productService.createCountry({
+      title: body.title,
+      info: [],
+    });
+    if (res.isError()) {
+      this.sendResult(response, res);
+      return;
+    }
 
-  // @Get('products')
-  // async getProductList(
-  //   @Res() response: Response,
-  //   @Query() query: GetProductQuery,
-  // ) {
-  //   const pagination = new Pagination(1);
-  //
-  //   let productIds: string[] = [];
-  //   if (query.orderBy == GetProductBy.SCORE) {
-  //     const commentProductIdsRes =
-  //       await this.commentService.getCommentProductIds(
-  //         query.orderType,
-  //         CommentOrderBy.SCORE,
-  //         {
-  //           skip: pagination.getSkip(),
-  //           limit: pagination.getLimit(),
-  //         },
-  //       );
-  //     if (commentProductIdsRes.isError()) {
-  //       this.sendResult(response, commentProductIdsRes);
-  //       return;
-  //     }
-  //
-  //     productIds = commentProductIdsRes.value.list;
-  //   } else if (query.orderBy == GetProductBy.SALE) {
-  //     const paymentProductIdsRes =
-  //       await this.paymentService.getPaymentProductIds(
-  //         {
-  //           skip: pagination.getSkip(),
-  //           limit: pagination.getLimit(),
-  //         },
-  //         query.orderType,
-  //         PaymentOrderBy.SALE,
-  //       );
-  //
-  //     if (paymentProductIdsRes.isError()) {
-  //       this.sendResult(response, paymentProductIdsRes);
-  //       return;
-  //     }
-  //     productIds = paymentProductIdsRes.value.list;
-  //   }
-  //
-  //   const productListRes = await this.productService.getProductList({
-  //     limitation: {
-  //       skip: 0,
-  //       limit: productIds.length,
-  //     },
-  //     productIds: productIds,
-  //     orderType: query.orderType,
-  //     orderBy:
-  //       query.orderBy == GetProductBy.CREATED_AT
-  //         ? ProductOrderBy.CREATED_AT
-  //         : ProductOrderBy.PRICE,
-  //   });
-  //   if (productListRes.isError()) {
-  //     this.sendResult(response, productListRes);
-  //     return;
-  //   }
-  //
-  //   const assetList = await this.assetService.getAssetList(
-  //     productListRes.value.list.map((x) => x.id),
-  //     {
-  //       limit: productIds.length,
-  //       skip: 0,
-  //     },
-  //   );
-  //   if (assetList.isError()) {
-  //     this.sendResult(response, assetList);
-  //     return;
-  //   }
-  //
-  //   let result: IProductEntity[] = [];
-  //   for (const x of productIds) {
-  //     const product = productListRes.value.list.find(
-  //       (product) => product.id == x,
-  //     );
-  //     if (product) {
-  //       result.push(product);
-  //     }
-  //   }
-  //   if (result.length == 0) {
-  //     result = productListRes.value.list;
-  //   }
-  //
-  //   this.sendResult(
-  //     response,
-  //     Ok<IPaginatedResult<GetProductResponse>>({
-  //       list: result.map((x) => {
-  //         const res: GetProductResponse = {
-  //           id: x.id,
-  //           title: x.title,
-  //           description: x.description,
-  //           price: x.price,
-  //           country: x.country,
-  //           quality: x.quality,
-  //           info: x.info.map((i) => ({
-  //             size: i.size,
-  //             color: i.color,
-  //             count: i.count,
-  //           })),
-  //           images: assetList.value.list
-  //             .filter((i) => i.targetId == x.id)
-  //             .map((i) => `${this.appConfig.baseUrl}/${i.directoryPath}`),
-  //           createdAt: x.createdAt.toISOString(),
-  //           category: { id: x.category.id },
-  //         };
-  //
-  //         return res;
-  //       }),
-  //       total: productListRes.value.total,
-  //       page: productListRes.value.page,
-  //       pageSize: productListRes.value.pageSize,
-  //     }),
-  //   );
-  // }
+    this.sendResult(
+      response,
+      Ok<CreateCountryResponse>({
+        id: res.value.id,
+        title: res.value.title,
+        createdAt: res.value.createdAt.toISOString(),
+      }),
+    );
+  }
+
+  @Post('quality')
+  @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiResponse({ type: CreateSizeResponse })
+  @ApiBody({ type: CreateSizeRequest })
+  async createQuality(
+    @Res() response: Response,
+    @Body() body: CreateQualityRequest,
+  ) {
+    const res = await this.productService.createQuality({
+      title: body.title,
+      info: [],
+    });
+    if (res.isError()) {
+      this.sendResult(response, res);
+      return;
+    }
+
+    this.sendResult(
+      response,
+      Ok<CreateQualityResponse>({
+        id: res.value.id,
+        title: res.value.title,
+        createdAt: res.value.createdAt.toISOString(),
+      }),
+    );
+  }
+
+  @Post('product')
+  @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiResponse({ type: CreateProductResponse })
+  @ApiBody({ type: CreateProductRequest })
+  async createProduct(
+    @Res() response: Response,
+    @Body() body: CreateProductRequest,
+  ) {
+    const createProduct = await this.productService.createProduct({
+      title: body.title,
+      description: body.description,
+      price: body.price,
+      country: body.country,
+      quality: body.quality,
+      category: { id: body.categoryId },
+      info: body.info.map((x) => ({
+        color: { id: x.colorId },
+        size: { id: x.sizeId },
+        count: x.count,
+      })),
+    });
+    if (createProduct.isError()) {
+      this.sendResult(response, createProduct);
+      return;
+    }
+
+    this.sendResult(
+      response,
+      Ok<CreateProductResponse>({
+        id: createProduct.value.id,
+        title: createProduct.value.title,
+        description: createProduct.value.description,
+        price: createProduct.value.price,
+        country: createProduct.value.country,
+        quality: createProduct.value.quality,
+        category: { id: createProduct.value.category.id },
+        info: createProduct.value.info.map((x) => ({
+          size: x.size.title,
+          color: x.color.title,
+          count: x.count,
+        })),
+        createdAt: createProduct.value.createdAt.toISOString(),
+      }),
+    );
+  }
+
+  @Post('products')
+  async getProductList(
+    @Res() response: Response,
+    @Body() body: GetProductRequest,
+  ) {
+    const pagination = new Pagination(1);
+
+    let productIds: string[] = [];
+    if (body.orderBy == GetProductBy.SCORE) {
+      const commentProductIdsRes =
+        await this.commentService.getCommentProductIds(
+          body.orderType,
+          CommentOrderBy.SCORE,
+          {
+            skip: pagination.getSkip(),
+            limit: pagination.getLimit(),
+          },
+        );
+      if (commentProductIdsRes.isError()) {
+        this.sendResult(response, commentProductIdsRes);
+        return;
+      }
+
+      productIds = commentProductIdsRes.value.list;
+    } else if (body.orderBy == GetProductBy.SALE) {
+      const paymentProductIdsRes =
+        await this.paymentService.getPaymentProductIds(
+          {
+            skip: pagination.getSkip(),
+            limit: pagination.getLimit(),
+          },
+          body.orderType,
+          PaymentOrderBy.SALE,
+        );
+
+      if (paymentProductIdsRes.isError()) {
+        this.sendResult(response, paymentProductIdsRes);
+        return;
+      }
+      productIds = paymentProductIdsRes.value.list;
+    }
+
+    const productListRes = await this.productService.getProductList({
+      limitation: {
+        skip: 0,
+        limit: productIds.length,
+      },
+      productIds: productIds,
+      orderType: body.orderType,
+      orderBy:
+        body.orderBy == GetProductBy.CREATED_AT
+          ? ProductOrderBy.CREATED_AT
+          : ProductOrderBy.PRICE,
+      sizeIds: body.sizeIds,
+      colorIds: body.colorIds,
+      price: [body.minPrice, body.maxPrice],
+    });
+    if (productListRes.isError()) {
+      this.sendResult(response, productListRes);
+      return;
+    }
+
+    const assetList = await this.assetService.getAssetList(
+      productListRes.value.list.map((x) => x.id),
+      {
+        limit: productIds.length,
+        skip: 0,
+      },
+    );
+    if (assetList.isError()) {
+      this.sendResult(response, assetList);
+      return;
+    }
+
+    let result: IProductEntity[] = [];
+    for (const x of productIds) {
+      const product = productListRes.value.list.find(
+        (product) => product.id == x,
+      );
+      if (product) {
+        result.push(product);
+      }
+    }
+    if (result.length == 0) {
+      result = productListRes.value.list;
+    }
+
+    this.sendResult(
+      response,
+      Ok<IPaginatedResult<GetProductResponse>>({
+        list: result.map((x) => {
+          const res: GetProductResponse = {
+            id: x.id,
+            title: x.title,
+            description: x.description,
+            price: x.price,
+            country: x.country,
+            quality: x.quality,
+            info: x.info.map((i) => ({
+              size: { id: i.size.id, title: i.size.title },
+              color: { id: i.color.id, title: i.color.title, hex: i.color.hex },
+              count: i.count,
+            })),
+            images: assetList.value.list
+              .filter((i) => i.targetId == x.id)
+              .map((i) => `${this.appConfig.baseUrl}/${i.directoryPath}`),
+            createdAt: x.createdAt.toISOString(),
+            category: { id: x.category.id },
+          };
+
+          return res;
+        }),
+        total: productListRes.value.total,
+        page: pagination.getPage(),
+        pageSize: pagination.getPageSize(),
+      }),
+    );
+  }
 
   @Post('category')
   @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
@@ -451,6 +518,44 @@ export class DashboardHttpController extends AbstractHttpController {
     this.sendResult(
       response,
       Ok<GetSizeListResponse>({
+        list: res.value.map((x) => ({
+          id: x.id,
+          title: x.title,
+          createdAt: x.createdAt.toISOString(),
+        })),
+      }),
+    );
+  }
+
+  @Get('country')
+  async getCountryList(@Res() response: Response) {
+    const res = await this.productService.getCountryList();
+    if (res.isError()) {
+      this.sendResult(response, res);
+    }
+
+    this.sendResult(
+      response,
+      Ok<GetCountryListResponse>({
+        list: res.value.map((x) => ({
+          id: x.id,
+          title: x.title,
+          createdAt: x.createdAt.toISOString(),
+        })),
+      }),
+    );
+  }
+
+  @Get('quality')
+  async getQualityList(@Res() response: Response) {
+    const res = await this.productService.getQualityList();
+    if (res.isError()) {
+      this.sendResult(response, res);
+    }
+
+    this.sendResult(
+      response,
+      Ok<GetQualityListResponse>({
         list: res.value.map((x) => ({
           id: x.id,
           title: x.title,

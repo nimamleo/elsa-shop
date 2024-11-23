@@ -5,6 +5,8 @@ import { GetProductList } from '../pgsql/service/dto/get-product-list.dto';
 import { IBasket, IBasketEntity } from '../../models/basket.model';
 import { IColor, IColorEntity } from '../../models/color.model';
 import { ISize, ISizeEntity } from '../../models/size.model';
+import { ICountry, ICountryEntity } from '../../models/country.model';
+import { IQuality, IQualityEntity } from '../../models/quality.model';
 
 export interface IProductReader {
   getCategoryList(): Promise<Result<ICategoryEntity[]>>;
@@ -25,6 +27,10 @@ export interface IProductReader {
   getColorList(): Promise<Result<IColorEntity[]>>;
 
   getSizeList(): Promise<Result<ISizeEntity[]>>;
+
+  getCountryList(): Promise<Result<ICountryEntity[]>>;
+
+  getQualityList(): Promise<Result<IQualityEntity[]>>;
 }
 export interface IProductWriter {
   createProduct(iProduct: IProduct): Promise<Result<IProductEntity>>;
@@ -32,6 +38,10 @@ export interface IProductWriter {
   createColor(iColor: IColor): Promise<Result<IColorEntity>>;
 
   createSize(iSize: ISize): Promise<Result<ISizeEntity>>;
+
+  createCountry(iCountry: ICountry): Promise<Result<ICountryEntity>>;
+
+  createQuality(iQuality: IQuality): Promise<Result<IQualityEntity>>;
 
   createCategory(iCategory: ICategory): Promise<Result<ICategoryEntity>>;
 

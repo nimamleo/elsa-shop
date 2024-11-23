@@ -56,13 +56,17 @@ export class AssetPgsqlService implements IAssetDatabaseProvider {
     targetIds: string[],
     limitation: ILimitation,
   ): Promise<Result<[IAssetEntity[], number]>> {
-    const [res, count] = await this.assetRepository
-      .createQueryBuilder('a')
-      .where('a.targetId in (:...ids)', { ids: targetIds })
-      .offset(limitation.skip)
-      .limit(limitation.limit)
-      .getManyAndCount();
+    if (targetIds && targetIds.length > 0) {
+      const [res, count] = await this.assetRepository
+        .createQueryBuilder('a')
+        .where('a.targetId in (:...ids)', { ids: targetIds })
+        .offset(limitation.skip)
+        .limit(limitation.limit)
+        .getManyAndCount();
 
-    return Ok([res.map((x) => AssetEntity.toIAssetEntity(x)), count]);
+      return Ok([res.map((x) => AssetEntity.toIAssetEntity(x)), count]);
+    }
+
+    return Ok([[], 0]);
   }
 }

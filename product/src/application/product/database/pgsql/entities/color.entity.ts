@@ -20,7 +20,7 @@ export class ColorEntity {
   @Column({ type: 'varchar', length: 255 })
   hex: string;
 
-  @OneToMany(() => InfoEntity, (x) => x.colorId)
+  @OneToMany(() => InfoEntity, (x) => x.color)
   info: InfoEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })

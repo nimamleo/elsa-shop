@@ -9,6 +9,8 @@ import { ProductPgsqlService } from './pgsql/service/product-pgsql.service';
 import { BasketEntity } from './pgsql/entities/basket.entity';
 import { ColorEntity } from './pgsql/entities/color.entity';
 import { SizeEntity } from './pgsql/entities/size.entity';
+import { CountryEntity } from './pgsql/entities/country.entity';
+import { QualityEntity } from './pgsql/entities/quality.entity';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { SizeEntity } from './pgsql/entities/size.entity';
       BasketEntity,
       ColorEntity,
       SizeEntity,
+      CountryEntity,
+      QualityEntity,
     ]),
   ],
   providers: [

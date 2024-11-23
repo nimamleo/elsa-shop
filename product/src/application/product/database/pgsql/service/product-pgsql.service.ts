@@ -18,6 +18,10 @@ import { IColor, IColorEntity } from '../../../models/color.model';
 import { ISize, ISizeEntity } from '../../../models/size.model';
 import { ColorEntity } from '../entities/color.entity';
 import { SizeEntity } from '../entities/size.entity';
+import { IQuality, IQualityEntity } from '../../../models/quality.model';
+import { ICountry, ICountryEntity } from '../../../models/country.model';
+import { QualityEntity } from '../entities/quality.entity';
+import { CountryEntity } from '../entities/country.entity';
 
 @Injectable()
 export class ProductPgsqlService implements IProductDatabaseProvider {
@@ -30,6 +34,10 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
     private readonly infoRepository: Repository<InfoEntity>,
     @InjectRepository(ColorEntity)
     private readonly colorRepository: Repository<ColorEntity>,
+    @InjectRepository(QualityEntity)
+    private readonly qualityRepository: Repository<QualityEntity>,
+    @InjectRepository(CountryEntity)
+    private readonly countryRepository: Repository<CountryEntity>,
     @InjectRepository(SizeEntity)
     private readonly sizeRepository: Repository<SizeEntity>,
     @InjectRepository(BasketEntity)
@@ -52,6 +60,8 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
             count: x.count,
             size: x.size,
             color: x.color,
+            quality: x.quality,
+            country: x.country,
           }),
         );
 
@@ -97,6 +107,30 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
   }
 
   @HandleError
+  async createQuality(iQuality: IQuality): Promise<Result<IQualityEntity>> {
+    const res = await this.qualityRepository.save(
+      QualityEntity.fromIQuality(iQuality),
+    );
+    if (!res) {
+      return Err('some thing went wrong');
+    }
+
+    return Ok(QualityEntity.toIQualityEntity(res));
+  }
+
+  @HandleError
+  async createCountry(iCountry: ICountry): Promise<Result<ICountryEntity>> {
+    const res = await this.countryRepository.save(
+      CountryEntity.fromICountry(iCountry),
+    );
+    if (!res) {
+      return Err('some thing went wrong');
+    }
+
+    return Ok(CountryEntity.toICountryEntity(res));
+  }
+
+  @HandleError
   async getCategoryList(): Promise<Result<ICategoryEntity[]>> {
     const res = await this.categoryRepository.createQueryBuilder().getMany();
     return Ok(res.map((x) => CategoryEntity.toICategoryEntity(x)));
@@ -115,10 +149,29 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
 
     const query = this.productRepository
       .createQueryBuilder('p')
-      .leftJoinAndSelect('p.info', 'i');
+      .leftJoinAndSelect('p.info', 'i')
+      .leftJoinAndSelect('i.color', 'c')
+      .leftJoinAndSelect('i.size', 's');
 
     if (queryable.productIds && queryable.productIds.length > 0) {
-      query.where('p.id in (:...ids)', { ids: queryable.productIds });
+      query.andWhere('p.id in (:...ids)', { ids: queryable.productIds });
+    }
+
+    if (queryable.colorIds && queryable.colorIds.length > 0) {
+      query.andWhere('c.id in (:...colorIds)', {
+        colorIds: queryable.colorIds,
+      });
+    }
+
+    if (queryable.sizeIds && queryable.sizeIds.length > 0) {
+      query.andWhere('s.id in (:...sizeIds)', { sizeIds: queryable.sizeIds });
+    }
+
+    if (queryable.price && queryable.price.length == 2) {
+      query.andWhere('p.price >= :min and p.price <= :max', {
+        min: queryable.price[0],
+        max: queryable.price[1],
+      });
     }
 
     switch (queryable.orderBy) {
@@ -242,5 +295,17 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
   async getColorList(): Promise<Result<IColorEntity[]>> {
     const res = await this.colorRepository.createQueryBuilder().getMany();
     return Ok(res.map((x) => ColorEntity.toIColorEntity(x)));
+  }
+
+  @HandleError
+  async getQualityList(): Promise<Result<IQualityEntity[]>> {
+    const res = await this.qualityRepository.createQueryBuilder().getMany();
+    return Ok(res.map((x) => QualityEntity.toIQualityEntity(x)));
+  }
+
+  @HandleError
+  async getCountryList(): Promise<Result<ICountryEntity[]>> {
+    const res = await this.countryRepository.createQueryBuilder().getMany();
+    return Ok(res.map((x) => CountryEntity.toICountryEntity(x)));
   }
 }

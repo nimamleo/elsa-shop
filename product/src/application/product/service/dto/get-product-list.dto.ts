@@ -7,6 +7,9 @@ export class GetProductList {
   productIds?: string[];
   orderType: Order;
   orderBy: ProductOrderBy;
+  colorIds: string[];
+  sizeIds: string[];
+  price: [number, number];
 }
 
 export class GetProductListDto {}

@@ -8,12 +8,13 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Size } from '../../../enum/size.enum';
 import { ProductEntity } from './product.entity';
 import { IInfo, IInfoEntity } from '../../../models/info.model';
 import { BasketEntity } from './basket.entity';
 import { SizeEntity } from './size.entity';
 import { ColorEntity } from './color.entity';
+import { QualityEntity } from './quality.entity';
+import { CountryEntity } from './country.entity';
 
 @Entity('info')
 export class InfoEntity {
@@ -26,13 +27,27 @@ export class InfoEntity {
   @Column({ type: 'bigint', unsigned: true })
   sizeId: number;
 
-  @ManyToOne(() => SizeEntity, (x) => x.info)
+  @Column({ type: 'bigint', unsigned: true })
+  qualityId: number;
+
+  @Column({ type: 'bigint', unsigned: true })
+  countryId: number;
+
+  @ManyToOne(() => ColorEntity, (x) => x.info)
   @JoinColumn({ name: 'colorId' })
   color: ColorEntity;
 
   @ManyToOne(() => SizeEntity, (x) => x.info)
   @JoinColumn({ name: 'sizeId' })
   size: SizeEntity;
+
+  @ManyToOne(() => QualityEntity, (x) => x.info)
+  @JoinColumn({ name: 'qualityId' })
+  quality: QualityEntity;
+
+  @ManyToOne(() => CountryEntity, (x) => x.info)
+  @JoinColumn({ name: 'countryId' })
+  country: CountryEntity;
 
   @Column({ type: 'int' })
   count: number;
@@ -84,6 +99,10 @@ export class InfoEntity {
       product: info.product
         ? ProductEntity.toIProductEntity(info.product)
         : { id: info.productId.toString() },
+      quality: info.quality
+        ? QualityEntity.toIQualityEntity(info.quality)
+        : { id: info.qualityId.toString() },
+      country: { id: '' },
       basket: [],
       createdAt: info.createdAt,
       updatedAt: info.updatedAt,

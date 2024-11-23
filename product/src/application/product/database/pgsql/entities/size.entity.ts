@@ -17,7 +17,7 @@ export class SizeEntity {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @OneToMany(() => InfoEntity, (x) => x.sizeId)
+  @OneToMany(() => InfoEntity, (x) => x.size)
   info: InfoEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })

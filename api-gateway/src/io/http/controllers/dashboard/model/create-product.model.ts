@@ -9,23 +9,20 @@ import {
   IsNumberString,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Size } from '@product/application/product/enum/size.enum';
 import { Transform, TransformFnParams, Type } from 'class-transformer';
-import * as console from 'node:console';
 
 export class CreateProductInfo {
   @ApiProperty()
   @IsOptional()
-  @IsString()
-  color: string;
+  @IsNumberString()
+  colorId: string;
 
-  @ApiProperty({ type: 'enum', enum: Size })
+  @ApiProperty()
   @IsOptional()
-  @IsEnum(Size)
-  size: Size;
+  @IsNumberString()
+  sizeId: string;
 
   @ApiProperty()
   @IsOptional()
@@ -65,15 +62,10 @@ export class CreateProductRequest {
   @IsNumberString()
   categoryId: string;
 
-  // @ApiProperty({ type: 'string', format: 'binary', isArray: true })
-  // files: string[];
-
   @ApiProperty({
     type: [CreateProductInfo],
   })
   @IsArray()
-  // @Transform(({ value }) => (Array.isArray(value) ? value : Array(value)))
-  // @ValidateNested({ each: true })
   @Type(() => CreateProductInfo)
   info: CreateProductInfo[];
 }
