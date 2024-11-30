@@ -60,8 +60,6 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
             count: x.count,
             size: x.size,
             color: x.color,
-            quality: x.quality,
-            country: x.country,
           }),
         );
 
@@ -151,7 +149,9 @@ export class ProductPgsqlService implements IProductDatabaseProvider {
       .createQueryBuilder('p')
       .leftJoinAndSelect('p.info', 'i')
       .leftJoinAndSelect('i.color', 'c')
-      .leftJoinAndSelect('i.size', 's');
+      .leftJoinAndSelect('i.size', 's')
+      .leftJoinAndSelect('p.country', 'co')
+      .leftJoinAndSelect('p.quality', 'q');
 
     if (queryable.productIds && queryable.productIds.length > 0) {
       query.andWhere('p.id in (:...ids)', { ids: queryable.productIds });

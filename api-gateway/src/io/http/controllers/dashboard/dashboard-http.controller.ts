@@ -81,10 +81,7 @@ import { GetCountryListResponse } from './model/get-country-list.model';
 import { GetQualityListResponse } from './model/get-quality-list.model';
 
 @Controller('dashboard')
-@UseGuards(AuthGuard, RBACGuard)
-@UsePipes(ValidationPipe)
 @ApiTags('dashboard')
-@ApiBearerAuth()
 export class DashboardHttpController extends AbstractHttpController {
   private readonly appConfig: IAppConfig;
   constructor(
@@ -102,6 +99,9 @@ export class DashboardHttpController extends AbstractHttpController {
   @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiResponse({ type: CreateColorResponse })
   @ApiBody({ type: CreateColorRequest })
+  @UseGuards(AuthGuard, RBACGuard)
+  @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   async createColor(
     @Res() response: Response,
     @Body() body: CreateColorRequest,
@@ -131,6 +131,9 @@ export class DashboardHttpController extends AbstractHttpController {
   @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiResponse({ type: CreateSizeResponse })
   @ApiBody({ type: CreateSizeRequest })
+  @UseGuards(AuthGuard, RBACGuard)
+  @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   async createSize(@Res() response: Response, @Body() body: CreateSizeRequest) {
     const res = await this.productService.createSize({
       title: body.title,
@@ -155,13 +158,15 @@ export class DashboardHttpController extends AbstractHttpController {
   @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiResponse({ type: CreateSizeResponse })
   @ApiBody({ type: CreateSizeRequest })
+  @UseGuards(AuthGuard, RBACGuard)
+  @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   async createCountry(
     @Res() response: Response,
     @Body() body: CreateCountryRequest,
   ) {
     const res = await this.productService.createCountry({
       title: body.title,
-      info: [],
     });
     if (res.isError()) {
       this.sendResult(response, res);
@@ -182,13 +187,15 @@ export class DashboardHttpController extends AbstractHttpController {
   @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiResponse({ type: CreateSizeResponse })
   @ApiBody({ type: CreateSizeRequest })
+  @UseGuards(AuthGuard, RBACGuard)
+  @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   async createQuality(
     @Res() response: Response,
     @Body() body: CreateQualityRequest,
   ) {
     const res = await this.productService.createQuality({
       title: body.title,
-      info: [],
     });
     if (res.isError()) {
       this.sendResult(response, res);
@@ -209,6 +216,9 @@ export class DashboardHttpController extends AbstractHttpController {
   @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiResponse({ type: CreateProductResponse })
   @ApiBody({ type: CreateProductRequest })
+  @UseGuards(AuthGuard, RBACGuard)
+  @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   async createProduct(
     @Res() response: Response,
     @Body() body: CreateProductRequest,
@@ -217,8 +227,8 @@ export class DashboardHttpController extends AbstractHttpController {
       title: body.title,
       description: body.description,
       price: body.price,
-      country: body.country,
-      quality: body.quality,
+      country: { id: body.countryId },
+      quality: { id: body.qualityId },
       category: { id: body.categoryId },
       info: body.info.map((x) => ({
         color: { id: x.colorId },
@@ -238,12 +248,12 @@ export class DashboardHttpController extends AbstractHttpController {
         title: createProduct.value.title,
         description: createProduct.value.description,
         price: createProduct.value.price,
-        country: createProduct.value.country,
-        quality: createProduct.value.quality,
+        country: createProduct.value.country.id,
+        quality: createProduct.value.quality.id,
         category: { id: createProduct.value.category.id },
         info: createProduct.value.info.map((x) => ({
-          size: x.size.title,
-          color: x.color.title,
+          size: x.size.id,
+          color: x.color.id,
           count: x.count,
         })),
         createdAt: createProduct.value.createdAt.toISOString(),
@@ -347,18 +357,19 @@ export class DashboardHttpController extends AbstractHttpController {
             title: x.title,
             description: x.description,
             price: x.price,
-            country: x.country,
-            quality: x.quality,
+            country: { id: x.country.id, title: x.country.title },
+            quality: { id: x.quality.id, title: x.quality.title },
             info: x.info.map((i) => ({
               size: { id: i.size.id, title: i.size.title },
               color: { id: i.color.id, title: i.color.title, hex: i.color.hex },
               count: i.count,
             })),
-            images: assetList.value.list
-              .filter((i) => i.targetId == x.id)
-              .map((i) => `${this.appConfig.baseUrl}/${i.directoryPath}`),
+            images: ['https://c961156.parspack.net/images/tshirt'],
+            // images: assetList.value.list
+            //   .filter((i) => i.targetId == x.id)
+            //   .map((i) => `${this.appConfig.baseUrl}/${i.directoryPath}`),
             createdAt: x.createdAt.toISOString(),
-            category: { id: x.category.id },
+            category: { id: x.category.id, title: x.category.title },
           };
 
           return res;
@@ -374,6 +385,9 @@ export class DashboardHttpController extends AbstractHttpController {
   @RBAC(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiResponse({ type: CreateCategoryResponse })
   @ApiBody({ type: CreateCategoryRequest })
+  @UseGuards(AuthGuard, RBACGuard)
+  @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   async createCategory(
     @Res() response: Response,
     @Body() body: CreateCategoryRequest,
@@ -421,6 +435,9 @@ export class DashboardHttpController extends AbstractHttpController {
   @UseInterceptors(FilesInterceptor('files'))
   @ApiConsumes('multipart/form-data')
   @ApiConsumes('multipart/form-data')
+  @UseGuards(AuthGuard, RBACGuard)
+  @UsePipes(ValidationPipe)
+  @ApiBearerAuth()
   async uploadFile(
     @Res() response: Response,
     @Body() body: UploadFilesRequest,

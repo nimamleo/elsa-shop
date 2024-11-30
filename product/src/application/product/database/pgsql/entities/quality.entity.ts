@@ -2,6 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -9,6 +11,7 @@ import {
 import { ISize, ISizeEntity } from '../../../models/size.model';
 import { InfoEntity } from './info.entity';
 import { IQuality, IQualityEntity } from '../../../models/quality.model';
+import { ProductEntity } from './product.entity';
 
 @Entity('quality')
 export class QualityEntity {
@@ -18,8 +21,8 @@ export class QualityEntity {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @OneToMany(() => InfoEntity, (x) => x.quality)
-  info: InfoEntity[];
+  @OneToMany(() => ProductEntity, (x) => x.country)
+  product: ProductEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -47,9 +50,9 @@ export class QualityEntity {
     return {
       id: quality.id.toString(),
       title: quality.title,
-      info:
-        quality.info && quality.info.length > 0
-          ? quality.info.map((x) => InfoEntity.toIInfoEntity(x))
+      product:
+        quality.product && quality.product.length > 0
+          ? quality.product.map((x) => ProductEntity.toIProductEntity(x))
           : [],
       createdAt: quality.createdAt,
       updatedAt: quality.updatedAt,

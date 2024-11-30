@@ -8,12 +8,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Quality } from '../../../enum/quality.enum';
-import { Country } from '../../../enum/country.enum';
 import { CategoryEntity } from './category.entity';
 import { InfoEntity } from './info.entity';
 import { IProduct, IProductEntity } from '../../../models/product.model';
 import { BasketEntity } from './basket.entity';
+import { CountryEntity } from './country.entity';
+import { QualityEntity } from './quality.entity';
 
 @Entity('product')
 export class ProductEntity {
@@ -29,13 +29,21 @@ export class ProductEntity {
   @Column({ type: 'int' })
   price: number;
 
-  @Column({ type: 'varchar' })
-  quality: Quality;
+  @Column({ type: 'bigint', unsigned: true })
+  qualityId: string;
 
-  @Column({ type: 'varchar' })
-  country: Country;
+  @ManyToOne(() => QualityEntity, (x) => x.product)
+  @JoinColumn({ name: 'qualityId' })
+  quality: QualityEntity;
 
-  @CreateDateColumn({ type: 'bigint', unsigned: true })
+  @Column({ type: 'bigint', unsigned: true })
+  countryId: string;
+
+  @ManyToOne(() => CountryEntity, (x) => x.product)
+  @JoinColumn({ name: 'countryId' })
+  country: CountryEntity;
+
+  @Column({ type: 'bigint', unsigned: true })
   categoryId: number;
 
   @ManyToOne(() => CategoryEntity, (x) => x.products)
@@ -64,9 +72,9 @@ export class ProductEntity {
     product.title = iProduct.title;
     product.description = iProduct.description;
     product.price = iProduct.price;
-    product.country = iProduct.country;
-    product.quality = iProduct.quality;
-    product.country = iProduct.country;
+    product.countryId = iProduct.country.id;
+    product.qualityId = iProduct.quality.id;
+    product.countryId = iProduct.country.id;
     product.categoryId = Number(iProduct.category.id);
 
     return product;
@@ -81,8 +89,12 @@ export class ProductEntity {
       title: product.title,
       description: product.description,
       price: product.price,
-      country: product.country,
-      quality: product.quality,
+      country: product.country
+        ? CountryEntity.toICountryEntity(product.country)
+        : { id: product.categoryId.toString() },
+      quality: product.quality
+        ? QualityEntity.toIQualityEntity(product.quality)
+        : { id: product.qualityId.toString() },
       category: product.category
         ? CategoryEntity.toICategoryEntity(product.category)
         : { id: product.categoryId.toString() },

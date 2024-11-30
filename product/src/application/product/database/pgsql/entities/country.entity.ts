@@ -2,12 +2,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { InfoEntity } from './info.entity';
 import { ICountry, ICountryEntity } from '../../../models/country.model';
+import { ProductEntity } from './product.entity';
 
 @Entity('country')
 export class CountryEntity {
@@ -17,8 +20,8 @@ export class CountryEntity {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @OneToMany(() => InfoEntity, (x) => x.country)
-  info: InfoEntity[];
+  @OneToMany(() => ProductEntity, (x) => x.country)
+  product: ProductEntity[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -46,9 +49,9 @@ export class CountryEntity {
     return {
       id: country.id.toString(),
       title: country.title,
-      info:
-        country.info && country.info.length > 0
-          ? country.info.map((x) => InfoEntity.toIInfoEntity(x))
+      product:
+        country.product && country.product.length > 0
+          ? country.product.map((x) => ProductEntity.toIProductEntity(x))
           : [],
       createdAt: country.createdAt,
       updatedAt: country.updatedAt,

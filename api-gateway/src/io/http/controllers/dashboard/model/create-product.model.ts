@@ -1,9 +1,5 @@
-import { Quality } from '@product/application/product/enum/quality.enum';
-import { Country } from '@product/application/product/enum/country.enum';
 import {
   IsArray,
-  IsEnum,
-  IsInt,
   IsNotEmpty,
   IsNumber,
   IsNumberString,
@@ -48,14 +44,14 @@ export class CreateProductRequest {
   price: number;
 
   @IsNotEmpty()
-  @IsEnum(Quality)
-  @ApiProperty({ type: 'enum', enum: Quality })
-  quality: Quality;
+  @IsNumberString()
+  @ApiProperty()
+  qualityId: string;
 
-  @ApiProperty({ type: 'enum', enum: Country })
   @IsNotEmpty()
-  @IsEnum(Country)
-  country: Country;
+  @IsNumberString()
+  @ApiProperty()
+  countryId: string;
 
   @ApiProperty()
   @IsNotEmpty()

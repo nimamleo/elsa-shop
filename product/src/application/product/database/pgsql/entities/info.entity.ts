@@ -27,12 +27,6 @@ export class InfoEntity {
   @Column({ type: 'bigint', unsigned: true })
   sizeId: number;
 
-  @Column({ type: 'bigint', unsigned: true })
-  qualityId: number;
-
-  @Column({ type: 'bigint', unsigned: true })
-  countryId: number;
-
   @ManyToOne(() => ColorEntity, (x) => x.info)
   @JoinColumn({ name: 'colorId' })
   color: ColorEntity;
@@ -40,14 +34,6 @@ export class InfoEntity {
   @ManyToOne(() => SizeEntity, (x) => x.info)
   @JoinColumn({ name: 'sizeId' })
   size: SizeEntity;
-
-  @ManyToOne(() => QualityEntity, (x) => x.info)
-  @JoinColumn({ name: 'qualityId' })
-  quality: QualityEntity;
-
-  @ManyToOne(() => CountryEntity, (x) => x.info)
-  @JoinColumn({ name: 'countryId' })
-  country: CountryEntity;
 
   @Column({ type: 'int' })
   count: number;
@@ -99,10 +85,6 @@ export class InfoEntity {
       product: info.product
         ? ProductEntity.toIProductEntity(info.product)
         : { id: info.productId.toString() },
-      quality: info.quality
-        ? QualityEntity.toIQualityEntity(info.quality)
-        : { id: info.qualityId.toString() },
-      country: { id: '' },
       basket: [],
       createdAt: info.createdAt,
       updatedAt: info.updatedAt,

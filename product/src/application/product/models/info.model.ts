@@ -9,8 +9,6 @@ import { IQualityEntity } from './quality.model';
 export interface IInfo {
   color: Partial<IColorEntity>;
   size: Partial<ISizeEntity>;
-  quality: Partial<IQualityEntity>;
-  country: Partial<IQualityEntity>;
   count: number;
   product: Partial<IProductEntity>;
   basket?: Partial<IBasketEntity>[];

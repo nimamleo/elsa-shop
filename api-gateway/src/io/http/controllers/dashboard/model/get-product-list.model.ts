@@ -13,6 +13,25 @@ import { GetProductBy } from '../enum/get-product-list.enum';
 export class CategoryResponse {
   @ApiProperty()
   id: string;
+
+  @ApiProperty()
+  title: string;
+}
+
+export class CountryResponse {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  title: string;
+}
+
+export class QualityResponse {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  title: string;
 }
 
 export class GetProductRequest {
@@ -91,10 +110,10 @@ export class GetProductResponse {
   price: number;
 
   @ApiProperty()
-  quality: string;
+  quality: QualityResponse;
 
   @ApiProperty()
-  country: string;
+  country: CountryResponse;
 
   @ApiProperty({ type: [CreateProductInfoResponse] })
   info: CreateProductInfoResponse[];
