@@ -62,23 +62,23 @@ dev-api-gateway-deploy-job:
   tags:
     - tech
 
-dev-rabbitmq-gateway-deploy-job:
-  stage: dev-rabbitmq-gateway-deploy
-  image: docker:24
-  only:
-    - develop
-  before_script:
-    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
-  script:
-    - cd docker/rabbitmq-gateway
-    - echo "$SHOP_ENV" > .env
-    - cat .env
-    - docker compose -f docker-compose.dev.yaml pull
-    - docker compose -f docker-compose.dev.yaml down
-    - docker compose -f docker-compose.dev.yaml up -d
-    - docker system prune -a --force
-  after_script:
-    - docker logout $CI_REGISTRY
-  tags:
-    - tech
+#dev-rabbitmq-gateway-deploy-job:
+#  stage: dev-rabbitmq-gateway-deploy
+#  image: docker:24
+#  only:
+#    - develop
+#  before_script:
+#    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+#  script:
+#    - cd docker/rabbitmq-gateway
+#    - echo "$SHOP_ENV" > .env
+#    - cat .env
+#    - docker compose -f docker-compose.dev.yaml pull
+#    - docker compose -f docker-compose.dev.yaml down
+#    - docker compose -f docker-compose.dev.yaml up -d
+#    - docker system prune -a --force
+#  after_script:
+#    - docker logout $CI_REGISTRY
+#  tags:
+#    - tech
 #
