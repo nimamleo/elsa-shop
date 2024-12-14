@@ -2,14 +2,14 @@ services:
   shop-backend:
     image: registry.gitlab.com/tech7684941/shop:${CI_PIPELINE_ID}-api
     networks:
-      - proxy
+      - proxy-api
       - db-back
       - cache-back
     env_file:
       - ./.env
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
+      - "traefik.docker.network=proxy-api"
       - "traefik.http.routers.shop-backend.rule=Host(`back-dev.elsa-gallery.shop`)"
       - "traefik.http.routers.shop-backend.entrypoints=websecure"
       - "traefik.http.routers.shop-backend.tls.certresolver=myresolver"
@@ -18,7 +18,7 @@ services:
       - 3010:3010
 
 networks:
-  proxy:
+  proxy-api:
     external: true
   db-back:
     external: true
